@@ -53,7 +53,7 @@ public class AddHandler implements ActionListener
 
     Element appendPokemon(int number, String name) throws ParserConfigurationException, IOException, SAXException
     {
-        Element first = Main.instance.getEntry(null, -1, true);
+        Element first = Main.instance.getEntry(null, -1, false);
         Element next = Main.instance.getEntry(null, number + 1, false);
         Element document = Main.instance.doc.getDocumentElement();
         Element ret = Main.instance.doc.createElement("Pokemon");

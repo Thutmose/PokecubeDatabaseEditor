@@ -28,7 +28,7 @@ public class ParseHandler implements ActionListener
         }
         catch (ParserConfigurationException | IOException | SAXException e)
         {
-            e.printStackTrace();
+            Main.instance.info.setText("ERROR: "+e);
         }
     }
 
@@ -117,6 +117,14 @@ public class ParseHandler implements ActionListener
                 attrib.setValue(stats[i].trim());
                 subNode.setAttributeNode(attrib);
             }
+        }
+        else
+        {
+            String attrib = Main.instance.attribChoice.getSelectedItem();
+            subNode.removeAttribute(attrib);
+            Attr at = Main.instance.doc.createAttribute(attrib);
+            at.setValue(Main.instance.input.getText().trim());
+            subNode.setAttributeNode(at);
         }
 
     }

@@ -76,6 +76,7 @@ public class Main extends Frame implements ActionListener, WindowListener
     TextField info;
 
     Button toggle;
+    Button save;
 
     // Edit buttons
 
@@ -161,9 +162,11 @@ public class Main extends Frame implements ActionListener, WindowListener
         Panel view = new Panel(new FlowLayout());
         Panel edit = new Panel(new BorderLayout());
 
-        Panel file = new Panel(new GridLayout(2, 1));
+        Panel file = new Panel(new GridLayout(3, 1));
         file.add(new Label("File"));
         file.add(fileName = new TextField(defaultFile));
+        file.add(save = new Button("Save"));
+        save.addActionListener(this);
         fileName.addActionListener(this);
         view.add(file);
 
@@ -262,6 +265,14 @@ public class Main extends Frame implements ActionListener, WindowListener
         add(edit);
         add(mergePanel);
 
+        try
+        {
+            getEntry(null, 0, true);
+        }
+        catch (ParserConfigurationException | IOException | SAXException e)
+        {
+            e.printStackTrace();
+        }
         updateBoxes(name);
         statNodeOptions.setEnabled(!moves);
         moveNodeOptions.setEnabled(moves);
@@ -318,6 +329,21 @@ public class Main extends Frame implements ActionListener, WindowListener
     @Override
     public void actionPerformed(ActionEvent evt)
     {
+
+        if (evt.getSource() == save)
+        {
+            try
+            {
+                cleanUpEmpty(doc);
+                writeXML(file);
+            }
+            catch (IOException e)
+            {
+                info.setText("ERROR: " + e);
+            }
+            return;
+        }
+
         if (!add.getActionCommand().equals("add new")) { return; }
 
         statNodeOptions.setEnabled(!moves);
@@ -335,6 +361,14 @@ public class Main extends Frame implements ActionListener, WindowListener
 
             name.setText("");
             number.setText("");
+            try
+            {
+                getEntry(null, 0, true);
+            }
+            catch (ParserConfigurationException | IOException | SAXException e)
+            {
+                info.setText("ERROR: " + e);
+            }
             updateBoxes(name);
             return;
         }
@@ -348,7 +382,7 @@ public class Main extends Frame implements ActionListener, WindowListener
             }
             catch (ParserConfigurationException | IOException | SAXException e)
             {
-                e.printStackTrace();
+                info.setText("ERROR: " + e);
             }
 
             updateBoxes(name);
@@ -363,7 +397,7 @@ public class Main extends Frame implements ActionListener, WindowListener
             }
             catch (ParserConfigurationException | IOException | SAXException e)
             {
-                e.printStackTrace();
+                info.setText("ERROR: " + e);
             }
             updateBoxes(name);
             return;
@@ -391,8 +425,6 @@ public class Main extends Frame implements ActionListener, WindowListener
 
         try
         {
-            boolean toEdit = false;
-
             if (source == name || source instanceof Button)
             {
                 String text = name.getText();
@@ -447,6 +479,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                 else
                 {
                     Attr attrib = subNode.getAttributeNode(attribChoice.getSelectedItem());
+                    System.out.println(attrib+" "+attribChoice);
                     if (attrib != null)
                     {
                         label.setText(attrib.getName());
@@ -498,14 +531,10 @@ public class Main extends Frame implements ActionListener, WindowListener
                     }
                 }
             }
-            if (toEdit)
-            {
-                writeXML(file);
-            }
         }
         catch (Exception e)
         {
-            info.setText("");
+            info.setText("ERROR: " + e);
         }
     }
 
@@ -521,14 +550,15 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     Element getEntry(String name, int number) throws ParserConfigurationException, IOException, SAXException
     {
-        return getEntry(name, number, true);
+        return getEntry(name, number, false);
     }
 
     boolean hasEntry(String name, int number) throws ParserConfigurationException, SAXException, IOException
     {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        doc = docBuilder.parse(file);
+        if (doc == null)
+        {
+            getEntry(number);
+        }
         NodeList entries = doc.getElementsByTagName("Pokemon");
         for (int i = 0; i < entries.getLength(); i++)
         {
@@ -542,9 +572,11 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     Element nextEntry(String name, int dir) throws ParserConfigurationException, SAXException, IOException
     {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        doc = docBuilder.parse(file);
+        if (doc == null)
+        {
+            getEntry(name);
+        }
+
         NodeList entries = doc.getElementsByTagName("Pokemon");
         Element next = null;
         for (int i = 0; i < entries.getLength(); i++)
@@ -564,8 +596,9 @@ public class Main extends Frame implements ActionListener, WindowListener
     Element getEntry(String name, int number, boolean newDoc)
             throws ParserConfigurationException, IOException, SAXException
     {
-        if (newDoc)
+        if (doc == null)
         {
+            System.out.println("test");
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             doc = docBuilder.parse(file);
@@ -592,14 +625,6 @@ public class Main extends Frame implements ActionListener, WindowListener
             {
                 cleanUpEmpty((Element) entries.item(i));
             }
-        }
-        try
-        {
-            instance.writeXML(file);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
         }
     }
 
@@ -628,7 +653,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                     Attr atrib = (Attr) entries.item(i).getAttributes().item(j);
                     if (atrib.getValue().trim().equals("0")) zero.add(atrib);
                 }
-                for(Attr at:zero)
+                for (Attr at : zero)
                     entries.item(i).getAttributes().removeNamedItem(at.getName());
 
             }
@@ -640,6 +665,7 @@ public class Main extends Frame implements ActionListener, WindowListener
     void writeXML(File file) throws IOException
     {
         writeXML(doc, file);
+        doc = null;
     }
 
     void writeXML(Document doc, File file) throws IOException
@@ -675,18 +701,18 @@ public class Main extends Frame implements ActionListener, WindowListener
                 }
                 catch (IOException e)
                 {
-                    e.printStackTrace();
+                    info.setText("ERROR: " + e);
                 }
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                info.setText("ERROR: " + e);
             }
 
         }
-        catch (TransformerException tfe)
+        catch (TransformerException e)
         {
-            tfe.printStackTrace();
+            info.setText("ERROR: " + e);
         }
     }
 
