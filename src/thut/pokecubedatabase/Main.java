@@ -108,17 +108,16 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     static
     {
-        statsNodes.put("EVOLUTIONMODE", "Method of evolution, some pokemon have multiple evos, some have none. See Eevee"
-                                + ".\nFormat: <evo1mode>:<requirement> <evo2mode>:<requirement>"
-                                + ".\nValid modes: Level, Stone:<stonetype, example water, fire, etc>, Happiness, Move:<movename>, Trade, etc"
-                                + ".\nModes can also have modifiers, see Gligar(207) for example of item and time requirements");
+        statsNodes.put("EVOLUTIONMODE",
+                "Method of evolution, some pokemon have multiple evos, some have none. See Eevee"
+                        + ".\nFormat: <evo1mode>:<requirement> <evo2mode>:<requirement>"
+                        + ".\nValid modes: Level, Stone:<stonetype, example water, fire, etc>, Happiness, Move:<movename>, Trade, etc"
+                        + ".\nModes can also have modifiers, see Gligar(207) for example of item and time requirements");
         statsNodes.put("CAPTURERATE", "The Capture Rate");
         statsNodes.put("EVOLUTIONANIMATION", "related to the colour of the evolution animation");
         statsNodes.put("RIDDENOFFSET", "Offset for position of rider");
-        statsNodes.put("PREY", "Species this pokemon eats." + 
-                                "\nFormat: <Species1> <Species2>");
-        statsNodes.put("SPECIES", "Species this pokemon is." + 
-                                "\nFormat: <Species1> <Species2>");
+        statsNodes.put("PREY", "Species this pokemon eats." + "\nFormat: <Species1> <Species2>");
+        statsNodes.put("SPECIES", "Species this pokemon is." + "\nFormat: <Species1> <Species2>");
         statsNodes.put("MOVEMENTTYPE", "options:normal, floating, flying, water");
         statsNodes.put("SPECIALEGGSPECIESRULES",
                 "special rules for what eggs are produced from varied parents, see NidoranF for example."
@@ -127,44 +126,49 @@ public class Main extends Frame implements ActionListener, WindowListener
         statsNodes.put("EVOLVESTO", "the pokemon's number which this evolves to.\nFormat: <evo1nb> <evo2nb>");
         statsNodes.put("EXPYIELD", "Base EXP from defeating");
         statsNodes.put("FOODDROP", "\"food\" item dropped, a guarenteed drop when wild one is killed."
-                + "\nFormat: <number>:<itemname>:<metadata>"
-                + "\nmetadata is optional.");
-        statsNodes.put("COMMONDROP", "list of common drops."
-                + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
-                + "\nmetadata is optional, but if chance is used, it is needed.");
-        statsNodes.put("RAREDROP", "list of rare drops."
-                + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
-                + "\nmetadata is optional, but if chance is used, it is needed.");
-        statsNodes.put("HELDITEM", "list of items held randomly by wild versions."
-                + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
-                + "\nmetadata is optional, but if chance is used, it is needed.");
+                + "\nFormat: <number>:<itemname>:<metadata>" + "\nmetadata is optional.");
+        statsNodes.put("COMMONDROP",
+                "list of common drops."
+                        + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
+                        + "\nmetadata is optional, but if chance is used, it is needed.");
+        statsNodes.put("RAREDROP",
+                "list of rare drops."
+                        + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
+                        + "\nmetadata is optional, but if chance is used, it is needed.");
+        statsNodes.put("HELDITEM",
+                "list of items held randomly by wild versions."
+                        + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
+                        + "\nmetadata is optional, but if chance is used, it is needed.");
         statsNodes.put("FOODMATERIAL", "materials this pokemon can eat (example, water, rock, light)");
         statsNodes.put("BASEFRIENDSHIP", "Base friendship for the pokemon");
-        statsNodes.put("BIOMESALLNEEDED", "spawn biomes, where all are needed to spawn."
-                + "\nFormat: <biometype1> <biometype2> <rate1>:<max1><min1>; <biometype3> <biometype4> <rate2>:<max2>:<min2>"
-                + "\nMax and min are optional, but if you have one, you need both.  Their default values are 4:2."
-                + "\nIn this example, the pokemob can spawn in a <biometype2> and <biometype1> biome, "
-                + "\nor a <biometype3> and <biometype4> biome.");
-        statsNodes.put("BIOMESANYACCEPTABLE", "spawn biomes where any are needed to spawn, any biome type listed here will be allowed."
-                + "\nFormat: <biometype1> <biometype2> <rate1>:<max1><min1>; <biometype3> <biometype4> <rate2>:<max2>:<min2>"
-                + "\nIn this case, <rate1> is the spawn rate in <biometype1> or <biometype2> and"
-                + "\n <rate2> is the spawn rate in <biometype3> or <biometype4>"
-                + "\n otherwise same format as for BIOMESALLNEEDED");
+        statsNodes.put("BIOMESALLNEEDED",
+                "spawn biomes, where all are needed to spawn."
+                        + "\nFormat: <biometype1> <biometype2> <rate1>:<max1><min1>; <biometype3> <biometype4> <rate2>:<max2>:<min2>"
+                        + "\nMax and min are optional, but if you have one, you need both.  Their default values are 4:2."
+                        + "\nIn this example, the pokemob can spawn in a <biometype2> and <biometype1> biome, "
+                        + "\nor a <biometype3> and <biometype4> biome.");
+        statsNodes.put("BIOMESANYACCEPTABLE",
+                "spawn biomes where any are needed to spawn, any biome type listed here will be allowed."
+                        + "\nFormat: <biometype1> <biometype2> <rate1>:<max1><min1>; <biometype3> <biometype4> <rate2>:<max2>:<min2>"
+                        + "\nIn this case, <rate1> is the spawn rate in <biometype1> or <biometype2> and"
+                        + "\n<rate2> is the spawn rate in <biometype3> or <biometype4>"
+                        + "\notherwise same format as for BIOMESALLNEEDED");
         statsNodes.put("EXCLUDEDBIOMES", "biomes it cannot spawn in. Types listed here are blacklisted for spawning."
                 + "\nFormat: <badBiome1> <badBiome2>");
-        statsNodes.put("SPECIALCASES", "special spawn rules."
-                + "\nFormat: <option1> <option2>"
-                + "\n Valid Options: starter, day, night, legendary, fossil, water");
-        statsNodes.put("ABILITY", "the abilities available to the pokemon.\n"
-                + "normal: the basic abilities, Format: <ability1>, <ability2>"
-                + "\nhidden: the hidden ability, Format: <ability>");
-        statsNodes.put("TYPE", "the pokemon's types."
-                + "type1: the first type listed, Format: <type1>"
-                + "type2: the second type listed, optional, Format: <type2>");
-        statsNodes.put("SIZES", "the dimensions of the pokemon."
-                + "height: how tall is the hitbox, Format: <height in meters>"
-                + "width: how wide is the hitbox, Format: <width in meters>"
-                + "length: how long is the hitbox, Format: <length in meters>");
+        statsNodes.put("SPECIALCASES", "special spawn rules." + "\nFormat: <option1> <option2>"
+                + "\nValid Options: starter, day, night, legendary, fossil, water, water+."
+                + "\nday/night are light level for spawn, starter adds to starter list, legendary has much lower spawn rate"
+                + "\nfossil will not spawn naturally, water only spawns in water, water+ spawns on land and in water.");
+        statsNodes.put("ABILITY",
+                "the abilities available to the pokemon.\n"
+                        + "normal: the basic abilities, Format: <ability1>, <ability2>"
+                        + "\nhidden: the hidden ability, Format: <ability>");
+        statsNodes.put("TYPE", "the pokemon's types." + "\ntype1: the first type listed, Format: <type1>"
+                + "\ntype2: the second type listed, optional, Format: <type2>");
+        statsNodes.put("SIZES",
+                "the dimensions of the pokemon." + "\nheight: how tall is the hitbox, Format: <height in meters>"
+                        + "\nwidth: how wide is the hitbox, Format: <width in meters>"
+                        + "\nlength: how long is the hitbox, Format: <length in meters>");
         statsNodes.put("EVYIELD", "evs gained from defeating this pokemon, blank values mean no EV of that stat.");
         statsNodes.put("BASESTATS", "this pokemon's base stats");
         statsNodes.put("LOGIC", "logic states.\n"
@@ -175,15 +179,17 @@ public class Main extends Frame implements ActionListener, WindowListener
                 + "\ndye: Format: <boolean>:<number>, does the pokemob support dying, number is the default state.");
         statsNodes.put("EXPERIENCEMODE", "The function used for mapping exp to level."
                 + "\nOptions: erratic, fast, medium fast, medium slow, slow, fluctuating");
-        statsNodes.put("PARTICLEEFFECTS", "particles produced."
-                + "\nFormat: <particle>:<rate>");
+        statsNodes.put("PARTICLEEFFECTS", "particles produced." + "\nFormat: <particle>:<rate>");
         statsNodes.put("GENDERRATIO", "ratio of genders.\n"
                 + "Options: 255 -> No gender, 254 -> all female, 0 -> all male, otherwise fraction of 254 as male/female");
-        statsNodes.put("INTERACTIONLOGIC", "item interaction logic");
+        statsNodes.put("INTERACTIONLOGIC",
+                "item interaction logic." + "\nFormat: <playerItem>`<result1> <playerIdem>`<result2>"
+                        + "\nResult format: <itemname>#<metadata>"
+                        + "\nIf <playerItem> is shears, it will attemp to shear, otherwise it will consume the item.");
         statsNodes.put("SHADOWREPLACEMENTS", "list of mobs to replace with shadow versions of this pokemon");
         statsNodes.put("HATEDMATERIALRULES", "list of rules for what materials this pokemon hates");
-        statsNodes.put("ACTIVETIMES", "list of times this pokemon is active."
-                + "\nDefault: all day. valid options: day, night, dusk, dawn");
+        statsNodes.put("ACTIVETIMES",
+                "list of times this pokemon is active." + "\nDefault: all day. valid options: day, night, dusk, dawn");
 
         statAttribs.put("LOGIC", "shoulder" + "," + "fly" + "," + "dive" + "," + "dye" + "," + "stationary");
         statAttribs.put("TYPE", "type1,type2");
@@ -201,9 +207,8 @@ public class Main extends Frame implements ActionListener, WindowListener
         setLayout(new GridLayout());
         addWindowListener(this);
 
-        Panel left = new Panel(new GridLayout(2,1));
-        
-        
+        Panel left = new Panel(new GridLayout(2, 1));
+
         Panel view = new Panel(new FlowLayout());
         Panel edit = new Panel(new BorderLayout());
 
@@ -309,7 +314,7 @@ public class Main extends Frame implements ActionListener, WindowListener
 
         left.add(view);
         left.add(mergePanel);
-        
+
         add(left);
         add(edit);
 
@@ -522,7 +527,8 @@ public class Main extends Frame implements ActionListener, WindowListener
                 if (!subNode.hasAttributes() || subNode.getAttributes().getLength() == 0)
                 {
                     label.setText("n/a");
-                    info.setText(subNode.getFirstChild().getNodeValue());
+                    if (subNode.hasChildNodes()) info.setText(subNode.getFirstChild().getNodeValue());
+                    else info.setText("");
                 }
                 else
                 {
