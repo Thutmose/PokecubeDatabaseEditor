@@ -330,7 +330,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                 int newNum = Integer.parseInt(number.getText());
                 try
                 {
-                    if (hasEntry(file, newname, newNum))
+                    if (hasEntry(newname, newNum))
                     {
                         info.setText("ERROR, THAT ENTRY ALREADY EXISTS");
                         return;
@@ -338,15 +338,13 @@ public class Main extends Frame implements ActionListener, WindowListener
                     else
                     {
                         appendPokemon(newNum, newname);
-                        info.setText("ADDED NEW ENTRY: "+newname);
+                        info.setText("ADDED NEW ENTRY: " + newname);
                     }
                 }
                 catch (ParserConfigurationException | SAXException | IOException e)
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                
 
             }
             System.out.println(add.getName() + " " + add.getActionCommand());
@@ -383,16 +381,31 @@ public class Main extends Frame implements ActionListener, WindowListener
 
         if (evt.getSource() == next)
         {
-            int num = Integer.parseInt(number.getText()) + 1;
-            number.setText("" + num);
-            updateBoxes(number);
+            try
+            {
+                Element next = nextEntry(name.getText(), 1);
+                if (next != null) name.setText(next.getAttribute("name"));
+            }
+            catch (ParserConfigurationException | IOException | SAXException e)
+            {
+                e.printStackTrace();
+            }
+
+            updateBoxes(name);
             return;
         }
         else if (evt.getSource() == prev)
         {
-            int num = Integer.parseInt(number.getText()) - 1;
-            number.setText("" + num);
-            updateBoxes(number);
+            try
+            {
+                Element next = nextEntry(name.getText(), -1);
+                if (next != null) name.setText(next.getAttribute("name"));
+            }
+            catch (ParserConfigurationException | IOException | SAXException e)
+            {
+                e.printStackTrace();
+            }
+            updateBoxes(name);
             return;
         }
 
@@ -414,7 +427,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         Element node = null;
 
         String text = name.getText();
-        node = getEntry(file, text);
+        node = getEntry(text);
 
         NodeList list;
 
@@ -461,7 +474,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         if (subNode.getNodeName().equals("BASESTATS") || subNode.getNodeName().equals("EVYIELD"))
         {
             String[] attribs = statAttribs.get("BASESTATS").split(",");
-            String[] stats = input.getText().split(" ");
+            String[] stats = input.getText().replace(",", " ").split(" ");
 
             if (stats.length != attribs.length)
             {
@@ -509,6 +522,19 @@ public class Main extends Frame implements ActionListener, WindowListener
             {
                 lines[i] = convertName(lines[i]);
             }
+
+            ArrayList<String> test = new ArrayList<>();
+            outer:
+            for (String s : lines)
+            {
+                for (String s1 : test)
+                {
+                    if (s.equals(s1)) continue outer;
+                }
+                test.add(s);
+            }
+            lines = test.toArray(new String[0]);
+
             String line = Arrays.toString(lines).replace("[", "").replace("]", "");
             subNode.removeAttribute("moves");
 
@@ -585,12 +611,12 @@ public class Main extends Frame implements ActionListener, WindowListener
             if (source == name || source instanceof Button)
             {
                 String text = name.getText();
-                node = getEntry(file, text);
+                node = getEntry(text);
             }
             else if (source == number)
             {
                 int num = Integer.parseInt(number.getText());
-                node = getEntry(file, num);
+                node = getEntry(num);
             }
 
             if (node == null) { return; }
@@ -698,22 +724,22 @@ public class Main extends Frame implements ActionListener, WindowListener
         }
     }
 
-    Element getEntry(File file, String name) throws ParserConfigurationException, IOException, SAXException
+    Element getEntry(String name) throws ParserConfigurationException, IOException, SAXException
     {
-        return getEntry(file, name, -1);
+        return getEntry(name, 0);
     }
 
-    Element getEntry(File file, int number) throws ParserConfigurationException, IOException, SAXException
+    Element getEntry(int number) throws ParserConfigurationException, IOException, SAXException
     {
-        return getEntry(file, null, number);
+        return getEntry(null, number);
     }
 
-    Element getEntry(File file, String name, int number) throws ParserConfigurationException, IOException, SAXException
+    Element getEntry(String name, int number) throws ParserConfigurationException, IOException, SAXException
     {
-        return getEntry(file, name, number, true);
+        return getEntry(name, number, true);
     }
 
-    boolean hasEntry(File file, String name, int number) throws ParserConfigurationException, SAXException, IOException
+    boolean hasEntry(String name, int number) throws ParserConfigurationException, SAXException, IOException
     {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -726,11 +752,31 @@ public class Main extends Frame implements ActionListener, WindowListener
             String name2 = pokemonNode.getAttribute("name");
             if (num == number && name2.equalsIgnoreCase(name)) return true;
         }
-
         return false;
     }
 
-    Element getEntry(File file, String name, int number, boolean newDoc)
+    Element nextEntry(String name, int dir) throws ParserConfigurationException, SAXException, IOException
+    {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        doc = docBuilder.parse(file);
+        NodeList entries = doc.getElementsByTagName("Pokemon");
+        Element next = null;
+        for (int i = 0; i < entries.getLength(); i++)
+        {
+            Element pokemonNode = (Element) entries.item(i);
+            String name2 = pokemonNode.getAttribute("name");
+            if (name2.equalsIgnoreCase(name))
+            {
+                if (dir == 1)
+                    return (i < entries.getLength() - 1) ? (Element) entries.item(i + 1) : (Element) entries.item(0);
+                else return (i > 0) ? (Element) entries.item(i - 1) : (Element) entries.item(entries.getLength() - 1);
+            }
+        }
+        return next;
+    }
+
+    Element getEntry(String name, int number, boolean newDoc)
             throws ParserConfigurationException, IOException, SAXException
     {
         if (newDoc)
@@ -844,8 +890,8 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     Element appendPokemon(int number, String name) throws ParserConfigurationException, IOException, SAXException
     {
-        Element first = getEntry(file, null, -1, true);
-        Element next = getEntry(file, null, number + 1, false);
+        Element first = getEntry(null, -1, true);
+        Element next = getEntry(null, number + 1, false);
         Element document = doc.getDocumentElement();
         Element ret = doc.createElement("Pokemon");
         ret.setAttribute("name", name);
