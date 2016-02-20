@@ -173,17 +173,36 @@ public class ParseHandler implements ActionListener
         }
         else if (Main.instance.moveNodeOptions.getSelectedItem().equals("LVLUP"))
         {
+
+            
+            String toParse = Main.instance.input.getText().trim().replace("\t", ":");
+
+            String[] lines = toParse.split("\\r?\\n");
+            
+            if(lines.length == 1 && lines[0].split(":").length == 1)
+            {
+                System.out.println("updating");
+                String attrib = Main.instance.attribChoice.getSelectedItem();
+                String line = lines[0];
+                String[] args = line.split(",");
+                line = "";
+                for(int i = 0; i<args.length; i++)
+                {
+                    line += convertName(args[i]);
+                    if(i<args.length-1) line += ", ";
+                }
+                subNode.getAttributeNode(attrib).setValue(line);
+                return;
+            }
+            
             HashSet<Attr> toRemove = new HashSet<>();
             for (int i = 0; i < subNode.getAttributes().getLength(); i++)
             {
                 toRemove.add((Attr) subNode.getAttributes().item(i));
             }
+            
             for (Attr attrib : toRemove)
                 subNode.removeAttributeNode(attrib);
-
-            String toParse = Main.instance.input.getText().trim().replace("\t", ":");
-
-            String[] lines = toParse.split("\\r?\\n");
 
             HashMap<String, String> levelmoves = new HashMap<>();
 

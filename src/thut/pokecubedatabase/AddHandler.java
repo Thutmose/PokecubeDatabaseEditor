@@ -42,7 +42,12 @@ public class AddHandler implements ActionListener
             }
             catch (ParserConfigurationException | SAXException | IOException e)
             {
-                e.printStackTrace();
+                String mess = e + "";
+                for (Object o : e.getStackTrace())
+                {
+                    mess += "\n" + o;
+                }
+                Main.instance.status.append(mess);
             }
 
         }

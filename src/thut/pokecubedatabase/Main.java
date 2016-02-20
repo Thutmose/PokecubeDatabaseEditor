@@ -74,6 +74,7 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     TextField label;
     TextField info;
+    TextArea  status;
 
     Button toggle;
     Button save;
@@ -207,7 +208,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         setLayout(new GridLayout());
         addWindowListener(this);
 
-        Panel left = new Panel(new GridLayout(2, 1));
+        Panel left = new Panel(new GridLayout(3, 1));
 
         Panel view = new Panel(new FlowLayout());
         Panel edit = new Panel(new BorderLayout());
@@ -256,6 +257,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         info.setEditable(false);
         label.setEditable(false);
 
+        view.add(new Label("stats/moves toggle:"));
         view.add(toggle = new Button("Stats"));
         toggle.addActionListener(this);
 
@@ -313,6 +315,8 @@ public class Main extends Frame implements ActionListener, WindowListener
         output.setText("output");
 
         left.add(view);
+        left.add(status = new TextArea(50, 50));
+        status.setEditable(false);
         left.add(mergePanel);
 
         add(left);
@@ -324,7 +328,12 @@ public class Main extends Frame implements ActionListener, WindowListener
         }
         catch (ParserConfigurationException | IOException | SAXException e)
         {
-            e.printStackTrace();
+            String mess = e + "";
+            for (Object o : e.getStackTrace())
+            {
+                mess += "\n" + o;
+            }
+            status.append(mess);
         }
         updateBoxes(name);
         statNodeOptions.setEnabled(!moves);
@@ -382,17 +391,24 @@ public class Main extends Frame implements ActionListener, WindowListener
     @Override
     public void actionPerformed(ActionEvent evt)
     {
-
+        status.setText("");
         if (evt.getSource() == save)
         {
             try
             {
+                status.setText("Saving Changes, please wait...");
                 cleanUpEmpty(doc);
                 writeXML(file);
+                status.setText("Done Saving");
             }
-            catch (IOException e)
+            catch (Exception e)
             {
-                info.setText("ERROR: " + e);
+                String mess = e + "";
+                for (Object o : e.getStackTrace())
+                {
+                    mess += "\n" + o;
+                }
+                status.append(mess);
             }
             return;
         }
@@ -420,9 +436,14 @@ public class Main extends Frame implements ActionListener, WindowListener
             }
             catch (ParserConfigurationException | IOException | SAXException e)
             {
-                info.setText("ERROR: " + e);
+                String mess = e + "";
+                for (Object o : e.getStackTrace())
+                {
+                    mess += "\n" + o;
+                }
+                status.append(mess);
             }
-            updateBoxes(name);
+            if (doc != null) updateBoxes(name);
             return;
         }
 
@@ -435,7 +456,12 @@ public class Main extends Frame implements ActionListener, WindowListener
             }
             catch (ParserConfigurationException | IOException | SAXException e)
             {
-                info.setText("ERROR: " + e);
+                String mess = e + "";
+                for (Object o : e.getStackTrace())
+                {
+                    mess += "\n" + o;
+                }
+                status.append(mess);
             }
 
             updateBoxes(name);
@@ -450,7 +476,12 @@ public class Main extends Frame implements ActionListener, WindowListener
             }
             catch (ParserConfigurationException | IOException | SAXException e)
             {
-                info.setText("ERROR: " + e);
+                String mess = e + "";
+                for (Object o : e.getStackTrace())
+                {
+                    mess += "\n" + o;
+                }
+                status.append(mess);
             }
             updateBoxes(name);
             return;
@@ -530,7 +561,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                     if (subNode.hasChildNodes()) info.setText(subNode.getFirstChild().getNodeValue());
                     else info.setText("");
                 }
-                else
+                else if(attribChoice.getSelectedItem()!=null)
                 {
                     Attr attrib = subNode.getAttributeNode(attribChoice.getSelectedItem());
                     if (attrib != null)
@@ -591,7 +622,12 @@ public class Main extends Frame implements ActionListener, WindowListener
         }
         catch (Exception e)
         {
-            info.setText("ERROR: " + e);
+            String mess = e + "";
+            for (Object o : e.getStackTrace())
+            {
+                mess += "\n" + o;
+            }
+            status.append(mess);
         }
     }
 
@@ -757,18 +793,33 @@ public class Main extends Frame implements ActionListener, WindowListener
                 }
                 catch (IOException e)
                 {
-                    info.setText("ERROR: " + e);
+                    String mess = e + "";
+                    for (Object o : e.getStackTrace())
+                    {
+                        mess += "\n" + o;
+                    }
+                    status.append(mess);
                 }
             }
             catch (Exception e)
             {
-                info.setText("ERROR: " + e);
+                String mess = e + "";
+                for (Object o : e.getStackTrace())
+                {
+                    mess += "\n" + o;
+                }
+                status.append(mess);
             }
 
         }
         catch (TransformerException e)
         {
-            info.setText("ERROR: " + e);
+            String mess = e + "";
+            for (Object o : e.getStackTrace())
+            {
+                mess += "\n" + o;
+            }
+            status.append(mess);
         }
     }
 
