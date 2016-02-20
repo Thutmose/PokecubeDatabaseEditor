@@ -46,8 +46,6 @@ public class AddHandler implements ActionListener
             }
 
         }
-        System.out.println(Main.instance.add.getName() + " " + Main.instance.add.getActionCommand());
-
     }
     
 

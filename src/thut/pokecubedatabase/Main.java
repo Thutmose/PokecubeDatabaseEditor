@@ -51,7 +51,7 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 // An AWT GUI program inherits from the top-level container java.awt.Frame
 public class Main extends Frame implements ActionListener, WindowListener
 {
-    final static String defaultFile      = "gen1.xml";
+    final static String defaultFile      = "pokemobs.xml";
     public static Main  instance;
     static File         file             = new File("./" + defaultFile);
     /**
@@ -80,7 +80,7 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     // Edit buttons
 
-    Label inputLabel;
+    TextArea inputLabel;
 
     TextArea input;
     Button   parse;
@@ -108,40 +108,82 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     static
     {
-        statsNodes.put("EVOLUTIONMODE", "Method/s of evolution");
+        statsNodes.put("EVOLUTIONMODE", "Method of evolution, some pokemon have multiple evos, some have none. See Eevee"
+                                + ".\nFormat: <evo1mode>:<requirement> <evo2mode>:<requirement>"
+                                + ".\nValid modes: Level, Stone:<stonetype, example water, fire, etc>, Happiness, Move:<movename>, Trade, etc"
+                                + ".\nModes can also have modifiers, see Gligar(207) for example of item and time requirements");
         statsNodes.put("CAPTURERATE", "The Capture Rate");
         statsNodes.put("EVOLUTIONANIMATION", "related to the colour of the evolution animation");
         statsNodes.put("RIDDENOFFSET", "Offset for position of rider");
-        statsNodes.put("PREY", "Species this pokemon eats");
-        statsNodes.put("SPECIES", "Species this pokemon is");
+        statsNodes.put("PREY", "Species this pokemon eats." + 
+                                "\nFormat: <Species1> <Species2>");
+        statsNodes.put("SPECIES", "Species this pokemon is." + 
+                                "\nFormat: <Species1> <Species2>");
         statsNodes.put("MOVEMENTTYPE", "options:normal, floating, flying, water");
-        statsNodes.put("SPECIALEGGSPECIESRULES", "special rules for what eggs are produced from varied parents");
+        statsNodes.put("SPECIALEGGSPECIESRULES",
+                "special rules for what eggs are produced from varied parents, see NidoranF for example."
+                        + "\nFormat, values are pokedex numbers: <father>:<child>`<child>;<father>:<child>`<child>");
         statsNodes.put("MASSKG", "The mass in kg");
-        statsNodes.put("EVOLVESTO", "the pokemon's number which this evolves to");
+        statsNodes.put("EVOLVESTO", "the pokemon's number which this evolves to.\nFormat: <evo1nb> <evo2nb>");
         statsNodes.put("EXPYIELD", "Base EXP from defeating");
-        statsNodes.put("FOODDROP", "\"food\" item dropped, a guarenteed drop when wild one is killed.");
-        statsNodes.put("COMMONDROP", "list of common drops");
-        statsNodes.put("RAREDROP", "list of rare drops");
-        statsNodes.put("HELDITEM", "list of items held randomly by wild versions");
-        statsNodes.put("FOODMATERIAL", "materials this pokemon can eat (example, watr, light)");
+        statsNodes.put("FOODDROP", "\"food\" item dropped, a guarenteed drop when wild one is killed."
+                + "\nFormat: <number>:<itemname>:<metadata>"
+                + "\nmetadata is optional.");
+        statsNodes.put("COMMONDROP", "list of common drops."
+                + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
+                + "\nmetadata is optional, but if chance is used, it is needed.");
+        statsNodes.put("RAREDROP", "list of rare drops."
+                + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
+                + "\nmetadata is optional, but if chance is used, it is needed.");
+        statsNodes.put("HELDITEM", "list of items held randomly by wild versions."
+                + "\nFormat: <number>:<itemname>:<metadata>:<chance> <number>:<itemname>:<metadata>:<chance>"
+                + "\nmetadata is optional, but if chance is used, it is needed.");
+        statsNodes.put("FOODMATERIAL", "materials this pokemon can eat (example, water, rock, light)");
         statsNodes.put("BASEFRIENDSHIP", "Base friendship for the pokemon");
-        statsNodes.put("BIOMESALLNEEDED", "spawn biomes, where all are needed to spawn");
-        statsNodes.put("BIOMESANYACCEPTABLE", "spawn biomes where any are needed to spawn");
-        statsNodes.put("EXCLUDEDBIOMES", "biomes it cannot spawn in");
-        statsNodes.put("SPECIALCASES", "special spawn rules");
-        statsNodes.put("ABILITY", "the abilities available to the pokemon");
-        statsNodes.put("TYPE", "the pokemon's types");
-        statsNodes.put("SIZES", "the sizes of the pokemon (l,w,h");
-        statsNodes.put("EVYIELD", "evs gained from defeating this pokemon");
+        statsNodes.put("BIOMESALLNEEDED", "spawn biomes, where all are needed to spawn."
+                + "\nFormat: <biometype1> <biometype2> <rate1>:<max1><min1>; <biometype3> <biometype4> <rate2>:<max2>:<min2>"
+                + "\nMax and min are optional, but if you have one, you need both.  Their default values are 4:2."
+                + "\nIn this example, the pokemob can spawn in a <biometype2> and <biometype1> biome, "
+                + "\nor a <biometype3> and <biometype4> biome.");
+        statsNodes.put("BIOMESANYACCEPTABLE", "spawn biomes where any are needed to spawn, any biome type listed here will be allowed."
+                + "\nFormat: <biometype1> <biometype2> <rate1>:<max1><min1>; <biometype3> <biometype4> <rate2>:<max2>:<min2>"
+                + "\nIn this case, <rate1> is the spawn rate in <biometype1> or <biometype2> and"
+                + "\n <rate2> is the spawn rate in <biometype3> or <biometype4>"
+                + "\n otherwise same format as for BIOMESALLNEEDED");
+        statsNodes.put("EXCLUDEDBIOMES", "biomes it cannot spawn in. Types listed here are blacklisted for spawning."
+                + "\nFormat: <badBiome1> <badBiome2>");
+        statsNodes.put("SPECIALCASES", "special spawn rules."
+                + "\nFormat: <option1> <option2>"
+                + "\n Valid Options: starter, day, night, legendary, fossil, water");
+        statsNodes.put("ABILITY", "the abilities available to the pokemon.\n"
+                + "normal: the basic abilities, Format: <ability1>, <ability2>"
+                + "\nhidden: the hidden ability, Format: <ability>");
+        statsNodes.put("TYPE", "the pokemon's types."
+                + "type1: the first type listed, Format: <type1>"
+                + "type2: the second type listed, optional, Format: <type2>");
+        statsNodes.put("SIZES", "the dimensions of the pokemon."
+                + "height: how tall is the hitbox, Format: <height in meters>"
+                + "width: how wide is the hitbox, Format: <width in meters>"
+                + "length: how long is the hitbox, Format: <length in meters>");
+        statsNodes.put("EVYIELD", "evs gained from defeating this pokemon, blank values mean no EV of that stat.");
         statsNodes.put("BASESTATS", "this pokemon's base stats");
-        statsNodes.put("LOGIC", "logic states");
-        statsNodes.put("EXPERIENCEMODE", "The function used for mapping exp to level");
-        statsNodes.put("PARTICLEEFFECTS", "particles produced");
-        statsNodes.put("GENDERRATIO", "ratio of genders");
+        statsNodes.put("LOGIC", "logic states.\n"
+                + "shoulder: should the pokemob jump on shoulder when right clicked with a stick."
+                + "\nfly: should the pokemob be able to carry player (defaulted true for flying types)"
+                + "\ndive: should the pokemob be able to dive with the player."
+                + "\nstationary: should the pokemob sit still, instead of wandering while idle"
+                + "\ndye: Format: <boolean>:<number>, does the pokemob support dying, number is the default state.");
+        statsNodes.put("EXPERIENCEMODE", "The function used for mapping exp to level."
+                + "\nOptions: erratic, fast, medium fast, medium slow, slow, fluctuating");
+        statsNodes.put("PARTICLEEFFECTS", "particles produced."
+                + "\nFormat: <particle>:<rate>");
+        statsNodes.put("GENDERRATIO", "ratio of genders.\n"
+                + "Options: 255 -> No gender, 254 -> all female, 0 -> all male, otherwise fraction of 254 as male/female");
         statsNodes.put("INTERACTIONLOGIC", "item interaction logic");
         statsNodes.put("SHADOWREPLACEMENTS", "list of mobs to replace with shadow versions of this pokemon");
         statsNodes.put("HATEDMATERIALRULES", "list of rules for what materials this pokemon hates");
-        statsNodes.put("ACTIVETIMES", "list of times this pokemon is active");
+        statsNodes.put("ACTIVETIMES", "list of times this pokemon is active."
+                + "\nDefault: all day. valid options: day, night, dusk, dawn");
 
         statAttribs.put("LOGIC", "shoulder" + "," + "fly" + "," + "dive" + "," + "dye" + "," + "stationary");
         statAttribs.put("TYPE", "type1,type2");
@@ -156,9 +198,12 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     public Main()
     {
-        setLayout(new GridLayout(4, 1));
+        setLayout(new GridLayout());
         addWindowListener(this);
 
+        Panel left = new Panel(new GridLayout(2,1));
+        
+        
         Panel view = new Panel(new FlowLayout());
         Panel edit = new Panel(new BorderLayout());
 
@@ -209,12 +254,13 @@ public class Main extends Frame implements ActionListener, WindowListener
         view.add(toggle = new Button("Stats"));
         toggle.addActionListener(this);
 
-        inputLabel = new Label();
+        inputLabel = new TextArea(5, 25);
+        inputLabel.setEditable(false);
         input = new TextArea(10, 50);
 
         Panel editInputs = new Panel(new GridLayout(1, 3));
 
-        Panel optionsPanel = new Panel(new GridLayout(1, 2));
+        Panel optionsPanel = new Panel(new GridLayout(2, 1));
         statNodeOptions = new Choice();
         statNodeOptions.addItemListener(choiceHandler);
         statNodeOptions.addFocusListener(choiceHandler);
@@ -248,22 +294,24 @@ public class Main extends Frame implements ActionListener, WindowListener
         edit.add(parse = new Button("Parse"), BorderLayout.SOUTH);
         parse.addActionListener(new ParseHandler());
 
-        Panel mergePanel = new Panel(new GridLayout(3, 1));
+        Panel mergePanel = new Panel(new FlowLayout());
 
-        mergePanel.add(doc1 = new TextField(5), BorderLayout.WEST);
-        mergePanel.add(doc2 = new TextField(5), BorderLayout.EAST);
-        mergePanel.add(output = new TextField(5), BorderLayout.NORTH);
+        mergePanel.add(doc1 = new TextField(5));
+        mergePanel.add(doc2 = new TextField(5));
+        mergePanel.add(output = new TextField(5));
 
-        mergePanel.add(merge = new Button("merge"), BorderLayout.SOUTH);
+        mergePanel.add(merge = new Button("merge"));
         merge.addActionListener(new MergeHandler());
 
         doc1.setText("doc1");
         doc2.setText("doc2");
         output.setText("output");
 
-        add(view);
+        left.add(view);
+        left.add(mergePanel);
+        
+        add(left);
         add(edit);
-        add(mergePanel);
 
         try
         {
@@ -479,11 +527,14 @@ public class Main extends Frame implements ActionListener, WindowListener
                 else
                 {
                     Attr attrib = subNode.getAttributeNode(attribChoice.getSelectedItem());
-                    System.out.println(attrib+" "+attribChoice);
                     if (attrib != null)
                     {
                         label.setText(attrib.getName());
                         info.setText(attrib.getNodeValue());
+                    }
+                    else
+                    {
+                        info.setText("");
                     }
                 }
             }
@@ -598,7 +649,6 @@ public class Main extends Frame implements ActionListener, WindowListener
     {
         if (doc == null)
         {
-            System.out.println("test");
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             doc = docBuilder.parse(file);

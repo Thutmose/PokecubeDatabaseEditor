@@ -30,7 +30,6 @@ public class MergeHandler implements ActionListener
         catch (ParserConfigurationException | SAXException | IOException e)
         {
             Main.instance.info.setText("ERROR:" + e);
-            e.printStackTrace();
         }
     }
 
