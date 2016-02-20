@@ -90,6 +90,12 @@ public class Main extends Frame implements ActionListener, WindowListener
     Choice attribChoice;
 
     ChoiceHandler choiceHandler = new ChoiceHandler(this);
+    
+    TextField doc1;
+    TextField doc2;
+    TextField output;
+    
+    Button merge;
 
     boolean moves = false;
 
@@ -150,7 +156,7 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     public Main()
     {
-        setLayout(new GridLayout(3, 1));
+        setLayout(new GridLayout(4, 1));
         addWindowListener(this);
 
         Panel view = new Panel(new FlowLayout());
@@ -233,8 +239,20 @@ public class Main extends Frame implements ActionListener, WindowListener
         edit.add(input, BorderLayout.CENTER);
         edit.add(parse = new Button("Parse"), BorderLayout.SOUTH);
 
+        Panel mergePanel = new Panel(new GridLayout(3, 1));
+
+        mergePanel.add(doc1 = new TextField(5), BorderLayout.WEST);
+        mergePanel.add(doc2 = new TextField(5), BorderLayout.EAST);
+        mergePanel.add(output = new TextField(5), BorderLayout.NORTH);
+        mergePanel.add(merge = new Button("merge"), BorderLayout.SOUTH);
+
+        doc1.setText("doc1");
+        doc2.setText("doc2");
+        output.setText("output");
+        
         add(view);
         add(edit);
+        add(mergePanel);
 
         updateBoxes(name);
         statNodeOptions.setEnabled(!moves);
@@ -314,6 +332,22 @@ public class Main extends Frame implements ActionListener, WindowListener
     @Override
     public void actionPerformed(ActionEvent evt)
     {
+        if(evt.getSource() == merge)
+        {
+            try
+            {
+                info.setText("");
+                mergeFiles(new File("./"+doc1.getText()), new File("./"+doc2.getText()), new File("./"+output.getText()));
+                info.setText("MERGED DATABASE FILES");
+            }
+            catch (ParserConfigurationException | SAXException | IOException e)
+            {
+                info.setText("ERROR:"+e);
+                e.printStackTrace();
+            }
+            return;
+        }
+        
         if (evt.getSource() == add)
         {
             if (add.getActionCommand().equals("add new"))
@@ -359,12 +393,17 @@ public class Main extends Frame implements ActionListener, WindowListener
             doc = null;
             file = null;
             file = new File("./" + fileName.getText());
+            
+            if(!file.exists())
+            {
+                file = new File("./" + fileName.getText()+".xml");
+            }
+            
             name.setText("");
             number.setText("");
             updateBoxes(name);
             return;
         }
-        System.out.println(evt);
         if (evt.getSource() == parse)
         {
 
@@ -470,7 +509,6 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     private void parseStats(Element subNode)
     {
-        System.out.println("Stats");
         if (subNode.getNodeName().equals("BASESTATS") || subNode.getNodeName().equals("EVYIELD"))
         {
             String[] attribs = statAttribs.get("BASESTATS").split(",");
@@ -605,7 +643,6 @@ public class Main extends Frame implements ActionListener, WindowListener
 
         try
         {
-
             boolean toEdit = false;
 
             if (source == name || source instanceof Button)
@@ -840,7 +877,13 @@ public class Main extends Frame implements ActionListener, WindowListener
             element.removeChild(oldChild);
     }
 
+    
     void writeXML(File file) throws IOException
+    {
+        writeXML(doc, file);
+    }
+    
+    void writeXML(Document doc, File file) throws IOException
     {
         try
         {
@@ -910,6 +953,41 @@ public class Main extends Frame implements ActionListener, WindowListener
         writeXML(file);
 
         return ret;
+    }
+    
+    void mergeFiles(File file1, File file2, File output) throws ParserConfigurationException, SAXException, IOException
+    {
+        
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc1 = docBuilder.parse(file1);
+        
+        docFactory = DocumentBuilderFactory.newInstance();
+        docBuilder = docFactory.newDocumentBuilder();
+        Document doc2 = docBuilder.parse(file2);
+        
+        Element root = doc1.getDocumentElement();
+
+        NodeList entries = doc2.getElementsByTagName("Pokemon");
+        NodeList entries2 = doc1.getElementsByTagName("Pokemon");
+        outer:
+        for (int i = 0; i < entries.getLength(); i++)
+        {
+            Element pokemonNode = (Element) entries.item(i);
+            for (int i1 = 0; i1 < entries2.getLength(); i1++)
+            {
+                Element pokemonNode2 = (Element) entries2.item(i1);
+                if(pokemonNode2.getAttribute("name").equals(pokemonNode.getAttribute("name")))
+                {
+                    System.out.println("Skipping "+pokemonNode2.getAttribute("name"));
+                    continue outer;
+                }
+            }
+            pokemonNode = (Element) pokemonNode.cloneNode(true);
+            doc1.adoptNode(pokemonNode);
+            root.appendChild(pokemonNode);
+        }
+        writeXML(doc1, output);
     }
 
     static class XmlFormatter
