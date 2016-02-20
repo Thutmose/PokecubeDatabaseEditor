@@ -24,9 +24,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,6 +52,7 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 public class Main extends Frame implements ActionListener, WindowListener
 {
     final static String defaultFile      = "gen1.xml";
+    public static Main  instance;
     static File         file             = new File("./" + defaultFile);
     /**
      * 
@@ -90,11 +89,11 @@ public class Main extends Frame implements ActionListener, WindowListener
     Choice attribChoice;
 
     ChoiceHandler choiceHandler = new ChoiceHandler(this);
-    
+
     TextField doc1;
     TextField doc2;
     TextField output;
-    
+
     Button merge;
 
     boolean moves = false;
@@ -173,6 +172,9 @@ public class Main extends Frame implements ActionListener, WindowListener
         pokemonControlButtons.add(next = new Button("next"));
         pokemonControlButtons.add(prev = new Button("prev"));
         pokemonControlButtons.add(add = new Button("add new"));
+        next.addActionListener(this);
+        prev.addActionListener(this);
+        add.addActionListener(new AddHandler());
 
         view.add(pokemonControlButtons);
 
@@ -185,6 +187,8 @@ public class Main extends Frame implements ActionListener, WindowListener
         number = new TextField(10);
         selection.add(number);
         view.add(selection);
+        name.addActionListener(this);
+        number.addActionListener(this);
 
         Panel buttons = new Panel(new BorderLayout(2, 3));
         buttons.add(label = new TextField("label", 5), BorderLayout.CENTER);
@@ -200,6 +204,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         label.setEditable(false);
 
         view.add(toggle = new Button("Stats"));
+        toggle.addActionListener(this);
 
         inputLabel = new Label();
         input = new TextArea(10, 50);
@@ -238,18 +243,21 @@ public class Main extends Frame implements ActionListener, WindowListener
         edit.add(optionsPanel, BorderLayout.NORTH);
         edit.add(input, BorderLayout.CENTER);
         edit.add(parse = new Button("Parse"), BorderLayout.SOUTH);
+        parse.addActionListener(new ParseHandler());
 
         Panel mergePanel = new Panel(new GridLayout(3, 1));
 
         mergePanel.add(doc1 = new TextField(5), BorderLayout.WEST);
         mergePanel.add(doc2 = new TextField(5), BorderLayout.EAST);
         mergePanel.add(output = new TextField(5), BorderLayout.NORTH);
+
         mergePanel.add(merge = new Button("merge"), BorderLayout.SOUTH);
+        merge.addActionListener(new MergeHandler());
 
         doc1.setText("doc1");
         doc2.setText("doc2");
         output.setText("output");
-        
+
         add(view);
         add(edit);
         add(mergePanel);
@@ -261,28 +269,6 @@ public class Main extends Frame implements ActionListener, WindowListener
         setTitle("Pokecube Database Info");
         setSize(1350, 500);
         setVisible(true);
-
-        // I am lazy.
-        for (Field field : getClass().getDeclaredFields())
-        {
-            Object o;
-            try
-            {
-                o = field.get(this);
-                if (o instanceof TextField)
-                {
-                    ((TextField) o).addActionListener(this);
-                }
-                if (o instanceof Button)
-                {
-                    ((Button) o).addActionListener(this);
-                }
-            }
-            catch (IllegalArgumentException | IllegalAccessException e)
-            {
-                e.printStackTrace();
-            }
-        }
     }
 
     /** The entry main() method */
@@ -290,7 +276,7 @@ public class Main extends Frame implements ActionListener, WindowListener
     {
         // Invoke the constructor to setup the GUI, by allocating an anonymous
         // instance
-        new Main();
+        instance = new Main();
     }
 
     @Override
@@ -332,58 +318,6 @@ public class Main extends Frame implements ActionListener, WindowListener
     @Override
     public void actionPerformed(ActionEvent evt)
     {
-        if(evt.getSource() == merge)
-        {
-            try
-            {
-                info.setText("");
-                mergeFiles(new File("./"+doc1.getText()), new File("./"+doc2.getText()), new File("./"+output.getText()));
-                info.setText("MERGED DATABASE FILES");
-            }
-            catch (ParserConfigurationException | SAXException | IOException e)
-            {
-                info.setText("ERROR:"+e);
-                e.printStackTrace();
-            }
-            return;
-        }
-        
-        if (evt.getSource() == add)
-        {
-            if (add.getActionCommand().equals("add new"))
-            {
-                add.setActionCommand("edit");
-                add.setLabel("confirm");
-            }
-            else
-            {
-                add.setActionCommand("add new");
-                add.setLabel("add new");
-
-                String newname = name.getText();
-                int newNum = Integer.parseInt(number.getText());
-                try
-                {
-                    if (hasEntry(newname, newNum))
-                    {
-                        info.setText("ERROR, THAT ENTRY ALREADY EXISTS");
-                        return;
-                    }
-                    else
-                    {
-                        appendPokemon(newNum, newname);
-                        info.setText("ADDED NEW ENTRY: " + newname);
-                    }
-                }
-                catch (ParserConfigurationException | SAXException | IOException e)
-                {
-                    e.printStackTrace();
-                }
-
-            }
-            System.out.println(add.getName() + " " + add.getActionCommand());
-            return;
-        }
         if (!add.getActionCommand().equals("add new")) { return; }
 
         statNodeOptions.setEnabled(!moves);
@@ -393,28 +327,15 @@ public class Main extends Frame implements ActionListener, WindowListener
             doc = null;
             file = null;
             file = new File("./" + fileName.getText());
-            
-            if(!file.exists())
+
+            if (!file.exists())
             {
-                file = new File("./" + fileName.getText()+".xml");
+                file = new File("./" + fileName.getText() + ".xml");
             }
-            
+
             name.setText("");
             number.setText("");
             updateBoxes(name);
-            return;
-        }
-        if (evt.getSource() == parse)
-        {
-
-            try
-            {
-                parseInput();
-            }
-            catch (ParserConfigurationException | IOException | SAXException e)
-            {
-                e.printStackTrace();
-            }
             return;
         }
 
@@ -457,179 +378,6 @@ public class Main extends Frame implements ActionListener, WindowListener
             choiceHandler.itemStateChanged(null);
         }
         updateBoxes(evt.getSource());
-    }
-
-    void parseInput() throws ParserConfigurationException, IOException, SAXException
-    {
-        if (input.getText().trim().isEmpty()) { return; }
-
-        Element node = null;
-
-        String text = name.getText();
-        node = getEntry(text);
-
-        NodeList list;
-
-        String type = moves ? "MOVES" : "STATS";
-        Choice choice = moves ? moveNodeOptions : statNodeOptions;
-        list = node.getElementsByTagName(type);
-        Element selectedNode;
-        if (list.getLength() == 0)
-        {
-            selectedNode = doc.createElement(type);
-            node.appendChild(selectedNode);
-        }
-        else
-        {
-            selectedNode = (Element) list.item(0);
-        }
-        Element subNode;
-        list = selectedNode.getElementsByTagName(choice.getSelectedItem());
-        if (list.getLength() == 0)
-        {
-            subNode = doc.createElement(choice.getSelectedItem());
-            selectedNode.appendChild(subNode);
-        }
-        else
-        {
-            subNode = (Element) list.item(0);
-        }
-
-        if (moves)
-        {
-            parseMoves(subNode);
-        }
-        else
-        {
-            parseStats(subNode);
-        }
-        cleanUpEmpty();
-        updateBoxes(name);
-    }
-
-    private void parseStats(Element subNode)
-    {
-        if (subNode.getNodeName().equals("BASESTATS") || subNode.getNodeName().equals("EVYIELD"))
-        {
-            String[] attribs = statAttribs.get("BASESTATS").split(",");
-            String[] stats = input.getText().replace(",", " ").split(" ");
-
-            if (stats.length != attribs.length)
-            {
-                info.setText(
-                        "ERROR INVALID NUMBER OF " + (subNode.getNodeName().equals("BASESTATS") ? "STATS" : "EVS"));
-                return;
-            }
-
-            for (int i = 0; i < stats.length; i++)
-            {
-                String s = stats[i];
-                try
-                {
-                    Integer.parseInt(s.trim());
-                }
-                catch (NumberFormatException e)
-                {
-                    info.setText("ERROR, " + attribs[i] + " MUST BE AN INTEGER");
-                    return;
-                }
-            }
-
-            Attr attrib;
-            for (int i = 0; i < attribs.length; i++)
-            {
-                String stat = attribs[i];
-                subNode.removeAttribute(stat);
-                attrib = doc.createAttribute(stat);
-                attrib.setValue(stats[i].trim());
-                subNode.setAttributeNode(attrib);
-            }
-        }
-
-    }
-
-    private void parseMoves(Element subNode)
-    {
-        if (moveNodeOptions.getSelectedItem().equals("MISC"))
-        {
-            String toParse = input.getText().trim().replace("\t", ":");
-
-            String[] lines = toParse.split("\\r?\\n");
-
-            for (int i = 0; i < lines.length; i++)
-            {
-                lines[i] = convertName(lines[i]);
-            }
-
-            ArrayList<String> test = new ArrayList<>();
-            outer:
-            for (String s : lines)
-            {
-                for (String s1 : test)
-                {
-                    if (s.equals(s1)) continue outer;
-                }
-                test.add(s);
-            }
-            lines = test.toArray(new String[0]);
-
-            String line = Arrays.toString(lines).replace("[", "").replace("]", "");
-            subNode.removeAttribute("moves");
-
-            Attr attrib;
-            attrib = doc.createAttribute("moves");
-            attrib.setValue(line);
-            subNode.setAttributeNode(attrib);
-        }
-        else if (moveNodeOptions.getSelectedItem().equals("LVLUP"))
-        {
-            HashSet<Attr> toRemove = new HashSet<>();
-            for (int i = 0; i < subNode.getAttributes().getLength(); i++)
-            {
-                toRemove.add((Attr) subNode.getAttributes().item(i));
-            }
-            for (Attr attrib : toRemove)
-                subNode.removeAttributeNode(attrib);
-
-            String toParse = input.getText().trim().replace("\t", ":");
-
-            String[] lines = toParse.split("\\r?\\n");
-
-            HashMap<String, String> levelmoves = new HashMap<>();
-
-            for (String s : lines)
-            {
-                String[] args = s.split(":");
-                String key = "lvl_" + args[0].trim();
-                String val = "";
-                if (levelmoves.containsKey(key))
-                {
-                    val = levelmoves.get(key) + ", ";
-                }
-                val += convertName(args[1]);
-                levelmoves.put(key, val);
-            }
-
-            Attr attrib;
-            for (String key : levelmoves.keySet())
-            {
-                attrib = doc.createAttribute(key);
-                attrib.setValue(levelmoves.get(key));
-                subNode.setAttributeNode(attrib);
-            }
-        }
-    }
-
-    private String convertName(String string)
-    {
-        String ret = "";
-        String name = string.trim().toLowerCase().replaceAll("[^\\w\\s ]", "");
-        String[] args = name.split(" ");
-        for (int i = 0; i < args.length; i++)
-        {
-            ret += args[i];
-        }
-        return ret.toUpperCase();
     }
 
     void updateBoxes(Object source)
@@ -835,7 +583,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         return first;
     }
 
-    void cleanUpEmpty()
+    static void cleanUpEmpty(Document doc)
     {
         NodeList entries = doc.getChildNodes();
         for (int i = 0; i < entries.getLength(); i++)
@@ -847,7 +595,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         }
         try
         {
-            writeXML(file);
+            instance.writeXML(file);
         }
         catch (Exception e)
         {
@@ -855,7 +603,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         }
     }
 
-    void cleanUpEmpty(Element element)
+    static void cleanUpEmpty(Element element)
     {
         boolean empty = !(element.hasChildNodes() || element.hasAttributes());
         if (empty) Thread.dumpStack();
@@ -872,17 +620,28 @@ public class Main extends Frame implements ActionListener, WindowListener
             {
                 toRemove.add((Element) entries.item(i));
             }
+            else if (attribs && entries.item(i).getNodeName().equals("EVYIELD"))
+            {
+                HashSet<Attr> zero = new HashSet<>();
+                for (int j = 0; j < entries.item(i).getAttributes().getLength(); j++)
+                {
+                    Attr atrib = (Attr) entries.item(i).getAttributes().item(j);
+                    if (atrib.getValue().trim().equals("0")) zero.add(atrib);
+                }
+                for(Attr at:zero)
+                    entries.item(i).getAttributes().removeNamedItem(at.getName());
+
+            }
         }
         for (Element oldChild : toRemove)
             element.removeChild(oldChild);
     }
 
-    
     void writeXML(File file) throws IOException
     {
         writeXML(doc, file);
     }
-    
+
     void writeXML(Document doc, File file) throws IOException
     {
         try
@@ -929,65 +688,6 @@ public class Main extends Frame implements ActionListener, WindowListener
         {
             tfe.printStackTrace();
         }
-    }
-
-    Element appendPokemon(int number, String name) throws ParserConfigurationException, IOException, SAXException
-    {
-        Element first = getEntry(null, -1, true);
-        Element next = getEntry(null, number + 1, false);
-        Element document = doc.getDocumentElement();
-        Element ret = doc.createElement("Pokemon");
-        ret.setAttribute("name", name);
-        ret.setAttribute("number", "" + number);
-
-        boolean append = first == next;
-        if (append)
-        {
-            document.appendChild(ret);
-        }
-        else
-        {
-            document.insertBefore(ret, next);
-        }
-
-        writeXML(file);
-
-        return ret;
-    }
-    
-    void mergeFiles(File file1, File file2, File output) throws ParserConfigurationException, SAXException, IOException
-    {
-        
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        Document doc1 = docBuilder.parse(file1);
-        
-        docFactory = DocumentBuilderFactory.newInstance();
-        docBuilder = docFactory.newDocumentBuilder();
-        Document doc2 = docBuilder.parse(file2);
-        
-        Element root = doc1.getDocumentElement();
-
-        NodeList entries = doc2.getElementsByTagName("Pokemon");
-        NodeList entries2 = doc1.getElementsByTagName("Pokemon");
-        outer:
-        for (int i = 0; i < entries.getLength(); i++)
-        {
-            Element pokemonNode = (Element) entries.item(i);
-            for (int i1 = 0; i1 < entries2.getLength(); i1++)
-            {
-                Element pokemonNode2 = (Element) entries2.item(i1);
-                if(pokemonNode2.getAttribute("name").equals(pokemonNode.getAttribute("name")))
-                {
-                    System.out.println("Skipping "+pokemonNode2.getAttribute("name"));
-                    continue outer;
-                }
-            }
-            pokemonNode = (Element) pokemonNode.cloneNode(true);
-            doc1.adoptNode(pokemonNode);
-            root.appendChild(pokemonNode);
-        }
-        writeXML(doc1, output);
     }
 
     static class XmlFormatter
