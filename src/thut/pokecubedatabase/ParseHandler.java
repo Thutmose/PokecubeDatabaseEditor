@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 public class ParseHandler implements ActionListener
@@ -121,15 +122,18 @@ public class ParseHandler implements ActionListener
         else
         {
             String attrib = Main.instance.attribChoice.getSelectedItem();
-
             if (attrib == null)
             {
-                subNode.getFirstChild().setNodeValue(Main.instance.input.getText().trim());
+                if (subNode.getFirstChild() == null)
+                {
+                    Text text = Main.instance.doc.createTextNode(Main.instance.input.getText().trim());
+                    subNode.appendChild(text);
+                }
+                else subNode.getFirstChild().setNodeValue(Main.instance.input.getText().trim());
             }
             else
             {
                 subNode.removeAttribute(attrib);
-                System.out.println(attrib);
                 Attr at = Main.instance.doc.createAttribute(attrib);
                 at.setValue(Main.instance.input.getText().trim());
                 subNode.setAttributeNode(at);
@@ -170,37 +174,37 @@ public class ParseHandler implements ActionListener
             attrib = Main.instance.doc.createAttribute("moves");
             attrib.setValue(line);
             subNode.setAttributeNode(attrib);
+            Main.instance.status.append("set moves");
         }
         else if (Main.instance.moveNodeOptions.getSelectedItem().equals("LVLUP"))
         {
 
-            
             String toParse = Main.instance.input.getText().trim().replace("\t", ":");
 
             String[] lines = toParse.split("\\r?\\n");
-            
-            if(lines.length == 1 && lines[0].split(":").length == 1)
+
+            if (lines.length == 1 && lines[0].split(":").length == 1)
             {
-                System.out.println("updating");
+                Main.instance.status.append("updating");
                 String attrib = Main.instance.attribChoice.getSelectedItem();
                 String line = lines[0];
                 String[] args = line.split(",");
                 line = "";
-                for(int i = 0; i<args.length; i++)
+                for (int i = 0; i < args.length; i++)
                 {
                     line += convertName(args[i]);
-                    if(i<args.length-1) line += ", ";
+                    if (i < args.length - 1) line += ", ";
                 }
                 subNode.getAttributeNode(attrib).setValue(line);
                 return;
             }
-            
+
             HashSet<Attr> toRemove = new HashSet<>();
             for (int i = 0; i < subNode.getAttributes().getLength(); i++)
             {
                 toRemove.add((Attr) subNode.getAttributes().item(i));
             }
-            
+
             for (Attr attrib : toRemove)
                 subNode.removeAttributeNode(attrib);
 
@@ -225,6 +229,7 @@ public class ParseHandler implements ActionListener
                 attrib = Main.instance.doc.createAttribute(key);
                 attrib.setValue(levelmoves.get(key));
                 subNode.setAttributeNode(attrib);
+                Main.instance.status.append(key + "=" + levelmoves.get(key) + "\n");
             }
         }
     }

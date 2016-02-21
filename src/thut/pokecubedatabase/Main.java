@@ -399,6 +399,8 @@ public class Main extends Frame implements ActionListener, WindowListener
                 status.setText("Saving Changes, please wait...");
                 cleanUpEmpty(doc);
                 writeXML(file);
+                doc = null;
+                getEntry(0);
                 status.setText("Done Saving");
             }
             catch (Exception e)
@@ -607,7 +609,8 @@ public class Main extends Frame implements ActionListener, WindowListener
                 if (!subNode.hasAttributes() || subNode.getAttributes().getLength() == 0)
                 {
                     label.setText("n/a");
-                    info.setText(subNode.getFirstChild().getNodeValue());
+                    if (subNode.hasChildNodes()) info.setText(subNode.getFirstChild().getNodeValue());
+                    else info.setText("");
                 }
                 else
                 {
