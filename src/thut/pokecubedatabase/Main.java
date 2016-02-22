@@ -68,8 +68,8 @@ public class Main extends Frame implements ActionListener, WindowListener
     // View Buttons
     TextField fileName;
 
-    TextField name;
-    TextField number;
+    TextField        name;
+    public TextField number;
 
     Button next;
     Button prev;
@@ -89,7 +89,7 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     TextArea input;
     Button   parse;
-    Button   fromSerebii;
+    Button   clear;
 
     Choice statNodeOptions;
     Choice moveNodeOptions;
@@ -112,7 +112,7 @@ public class Main extends Frame implements ActionListener, WindowListener
     public static HashMap<String, String> movesNodes  = new HashMap<>();
     public static HashMap<String, String> statAttribs = new HashMap<>();
 
-    SerebiiChecker serebii = new SerebiiChecker();
+    SerebiiChecker serebii;
 
     static
     {
@@ -305,8 +305,13 @@ public class Main extends Frame implements ActionListener, WindowListener
 
         edit.add(optionsPanel, BorderLayout.NORTH);
         edit.add(input, BorderLayout.CENTER);
-        edit.add(parse = new Button("Parse"), BorderLayout.SOUTH);
-        parse.addActionListener(new ParseHandler());
+        Panel parseButtons = new Panel();
+        edit.add(parseButtons, BorderLayout.SOUTH);
+        parseButtons.add(parse = new Button("Parse"));
+        parseButtons.add(clear = new Button("Clear"));
+        ParseHandler parser = new ParseHandler();
+        parse.addActionListener(parser);
+        clear.addActionListener(parser);
 
         Panel mergePanel = new Panel(new FlowLayout());
 
@@ -325,8 +330,9 @@ public class Main extends Frame implements ActionListener, WindowListener
         left.add(status = new TextArea(50, 50));
         status.setEditable(false);
         left.add(mergePanel);
-        view.add(fromSerebii = new Button("Update From Serebii"));
-        fromSerebii.addActionListener(this);
+
+        serebii = new SerebiiChecker(this);
+        view.add(serebii.panel);
 
         add(left);
         add(edit);
@@ -349,7 +355,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         moveNodeOptions.setEnabled(moves);
         choiceHandler.itemStateChanged(null);
         setTitle("Pokecube Database Info");
-        setSize(1350, 500);
+        setSize(1350, 600);
         setVisible(true);
     }
 
@@ -401,21 +407,6 @@ public class Main extends Frame implements ActionListener, WindowListener
     public void actionPerformed(ActionEvent evt)
     {
         status.setText("");
-
-        if (evt.getSource() == fromSerebii)
-        {
-            if (add.getActionCommand().equals("add new"))
-            {
-                for (int i = 1; i <= 721; i++)
-                    serebii.updateFromSerebii(i);
-            }
-            else
-            {
-                int num = Integer.parseInt(number.getText());
-                serebii.updateFromSerebii(num);
-            }
-            return;
-        }
 
         if (evt.getSource() == save)
         {
@@ -669,8 +660,10 @@ public class Main extends Frame implements ActionListener, WindowListener
             System.err.println("No Entry for " + name);
             return;
         }
-
-        node = Main.instance.getEntry(name);
+        else
+        {
+            node = Main.instance.getEntry(name);
+        }
 
         NodeList list;
 
@@ -776,7 +769,8 @@ public class Main extends Frame implements ActionListener, WindowListener
         return getEntry(name, number, false);
     }
 
-    public boolean hasEntry(String name, int number) throws ParserConfigurationException, SAXException, IOException
+    public boolean hasEntry(String name, int number, boolean checkFormes)
+            throws ParserConfigurationException, IOException, SAXException
     {
         if (doc == null)
         {
@@ -790,7 +784,19 @@ public class Main extends Frame implements ActionListener, WindowListener
             String name2 = pokemonNode.getAttribute("name");
             if ((num == number || number == -1) && name2.equalsIgnoreCase(name)) return true;
         }
+        if (checkFormes) for (int i = 0; i < entries.getLength(); i++)
+        {
+            Element pokemonNode = (Element) entries.item(i);
+            int num = Integer.parseInt(pokemonNode.getAttribute("number"));
+            String name2 = pokemonNode.getAttribute("name");
+            if ((num == number || number == -1) && name2.contains(name)) return true;
+        }
         return false;
+    }
+
+    public boolean hasEntry(String name, int number) throws ParserConfigurationException, SAXException, IOException
+    {
+        return hasEntry(name, number, false);
     }
 
     Element nextEntry(String name, int dir) throws ParserConfigurationException, SAXException, IOException
@@ -819,6 +825,12 @@ public class Main extends Frame implements ActionListener, WindowListener
     Element getEntry(String name, int number, boolean newDoc)
             throws ParserConfigurationException, IOException, SAXException
     {
+        return getEntry(name, number, newDoc, false);
+    }
+
+    public Element getEntry(String name, int number, boolean newDoc, boolean checkFormes)
+            throws ParserConfigurationException, IOException, SAXException
+    {
         if (doc == null)
         {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -834,6 +846,14 @@ public class Main extends Frame implements ActionListener, WindowListener
             int num = Integer.parseInt(pokemonNode.getAttribute("number"));
             String name2 = pokemonNode.getAttribute("name");
             if (num == number || name2.equalsIgnoreCase(name)) return pokemonNode;
+        }
+        if (checkFormes) for (int i = 0; i < entries.getLength(); i++)
+        {
+            Element pokemonNode = (Element) entries.item(i);
+            if (i == 0) first = pokemonNode;
+            int num = Integer.parseInt(pokemonNode.getAttribute("number"));
+            String name2 = pokemonNode.getAttribute("name");
+            if (num == number || name2.toLowerCase().contains(name.toLowerCase())) return pokemonNode;
         }
         return first;
     }
@@ -877,7 +897,17 @@ public class Main extends Frame implements ActionListener, WindowListener
                 }
                 for (Attr at : zero)
                     entries.item(i).getAttributes().removeNamedItem(at.getName());
-
+            }
+            else if (attribs)
+            {
+                HashSet<Attr> zero = new HashSet<>();
+                for (int j = 0; j < entries.item(i).getAttributes().getLength(); j++)
+                {
+                    Attr atrib = (Attr) entries.item(i).getAttributes().item(j);
+                    if (atrib.getValue().trim().equals("")) zero.add(atrib);
+                }
+                for (Attr at : zero)
+                    entries.item(i).getAttributes().removeNamedItem(at.getName());
             }
         }
         for (Object oldChild : toRemove)

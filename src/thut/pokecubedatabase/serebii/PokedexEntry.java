@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import thut.pokecubedatabase.Main;
@@ -16,8 +17,11 @@ import thut.pokecubedatabase.ParseHandler;
 
 public class PokedexEntry
 {
-    final int         number;
-    final String      name;
+
+    HashMap<String, PokedexEntry> formes;
+
+    int               number;
+    String            name;
     String[]          types           = new String[2];
     int               genderRatio     = 255;
     float             size;
@@ -223,9 +227,19 @@ public class PokedexEntry
         {
             if (!Main.instance.hasEntry(name, -1))
             {
-                System.err.println("No Entry for " + name);
-                return;
+                if (Main.instance.hasEntry(name, -1, true))
+                {
+                    Element e = Main.instance.getEntry(name, number, false, true);
+                    name = e.getAttribute("name");
+                    return;
+                }
+                else
+                {
+                    System.err.println("No Entry for " + name);
+                    return;
+                }
             }
+
         }
         catch (ParserConfigurationException | SAXException | IOException e1)
         {

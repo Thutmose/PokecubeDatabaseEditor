@@ -1,5 +1,8 @@
 package thut.pokecubedatabase.serebii;
 
+import java.awt.Button;
+import java.awt.Label;
+import java.awt.Panel;
 import java.io.IOException;
 import java.util.HashSet;
 
@@ -10,11 +13,18 @@ import org.jsoup.nodes.Entities.EscapeMode;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
+import thut.pokecubedatabase.Main;
+
 public class SerebiiChecker
 {
     public static final int TOTALCOUNT = 721;
 
     static HashSet<String> movesets = new HashSet<>();
+
+    public Panel  panel;
+    Button        update;
+    Button        mode;
+    ButtonHandler handler;
 
     static
     {
@@ -27,8 +37,15 @@ public class SerebiiChecker
         movesets.add("Stats");
     }
 
-    public SerebiiChecker()
+    public SerebiiChecker(Main main)
     {
+        this.panel = new Panel();
+        handler = new ButtonHandler(this);
+        panel.add(new Label("Update Mode:"));
+        panel.add(mode = new Button("Selected"));
+        panel.add(update = new Button("Update From Serebii"));
+        mode.addActionListener(handler);
+        update.addActionListener(handler);
     }
 
     public void updateFromSerebii(int num)
@@ -116,9 +133,10 @@ public class SerebiiChecker
                                     }
                                     catch (Exception e)
                                     {
-//                                        System.err.println(entry.name + " " + node.childNode(0).attr("src") + " "
-//                                                + node.childNode(0));
-                                        System.err.println("Error with types for "+name);
+                                        // System.err.println(entry.name + " " +
+                                        // node.childNode(0).attr("src") + " "
+                                        // + node.childNode(0));
+                                        System.err.println("Error with types for " + name);
                                     }
                                 }
                             }

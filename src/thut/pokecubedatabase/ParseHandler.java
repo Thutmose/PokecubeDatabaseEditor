@@ -25,7 +25,7 @@ public class ParseHandler implements ActionListener
     {
         try
         {
-            parseInput();
+            parseInput(evt.getSource() == Main.instance.parse);
         }
         catch (ParserConfigurationException | IOException | SAXException e)
         {
@@ -33,9 +33,9 @@ public class ParseHandler implements ActionListener
         }
     }
 
-    void parseInput() throws ParserConfigurationException, IOException, SAXException
+    void parseInput(boolean parse) throws ParserConfigurationException, IOException, SAXException
     {
-        if (Main.instance.input.getText().trim().isEmpty()) { return; }
+        if (Main.instance.input.getText().trim().isEmpty() && parse) { return; }
 
         Element node = null;
 
@@ -213,7 +213,17 @@ public class ParseHandler implements ActionListener
             for (String s : lines)
             {
                 String[] args = s.split(":");
-                String key = "lvl_" + args[0].trim();
+                String arg = args[0].trim();
+                try
+                {
+                    Integer.parseInt(arg.trim());
+                }
+                catch (NumberFormatException e)
+                {
+                    arg = "1";
+                }
+
+                String key = "lvl_" + arg;
                 String val = "";
                 if (levelmoves.containsKey(key))
                 {
