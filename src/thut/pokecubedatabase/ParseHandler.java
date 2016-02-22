@@ -234,7 +234,7 @@ public class ParseHandler implements ActionListener
         }
     }
 
-    private String convertName(String string)
+    public static String convertName(String string)
     {
         String ret = "";
         String name = string.trim().toLowerCase().replaceAll("[^\\w\\s ]", "");

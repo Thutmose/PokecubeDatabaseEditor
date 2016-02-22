@@ -41,12 +41,16 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+
+import thut.pokecubedatabase.serebii.SerebiiChecker;
 
 // An AWT GUI program inherits from the top-level container java.awt.Frame
 public class Main extends Frame implements ActionListener, WindowListener
@@ -72,9 +76,9 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     Button add;
 
-    TextField label;
-    TextField info;
-    TextArea  status;
+    TextField       label;
+    TextField       info;
+    public TextArea status;
 
     Button toggle;
     Button save;
@@ -85,6 +89,7 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     TextArea input;
     Button   parse;
+    Button   fromSerebii;
 
     Choice statNodeOptions;
     Choice moveNodeOptions;
@@ -98,14 +103,16 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     Button merge;
 
-    boolean moves = false;
+    public boolean moves = false;
 
-    Document doc;
-    Element  node = null;
+    public Document doc;
+    public Element  node = null;
 
-    static HashMap<String, String> statsNodes  = new HashMap<>();
-    static HashMap<String, String> movesNodes  = new HashMap<>();
-    static HashMap<String, String> statAttribs = new HashMap<>();
+    public static HashMap<String, String> statsNodes  = new HashMap<>();
+    public static HashMap<String, String> movesNodes  = new HashMap<>();
+    public static HashMap<String, String> statAttribs = new HashMap<>();
+
+    SerebiiChecker serebii = new SerebiiChecker();
 
     static
     {
@@ -318,6 +325,8 @@ public class Main extends Frame implements ActionListener, WindowListener
         left.add(status = new TextArea(50, 50));
         status.setEditable(false);
         left.add(mergePanel);
+        view.add(fromSerebii = new Button("Update From Serebii"));
+        fromSerebii.addActionListener(this);
 
         add(left);
         add(edit);
@@ -392,6 +401,22 @@ public class Main extends Frame implements ActionListener, WindowListener
     public void actionPerformed(ActionEvent evt)
     {
         status.setText("");
+
+        if (evt.getSource() == fromSerebii)
+        {
+            if (add.getActionCommand().equals("add new"))
+            {
+                for (int i = 1; i <= 721; i++)
+                    serebii.updateFromSerebii(i);
+            }
+            else
+            {
+                int num = Integer.parseInt(number.getText());
+                serebii.updateFromSerebii(num);
+            }
+            return;
+        }
+
         if (evt.getSource() == save)
         {
             try
@@ -563,7 +588,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                     if (subNode.hasChildNodes()) info.setText(subNode.getFirstChild().getNodeValue());
                     else info.setText("");
                 }
-                else if(attribChoice.getSelectedItem()!=null)
+                else if (attribChoice.getSelectedItem() != null)
                 {
                     Attr attrib = subNode.getAttributeNode(attribChoice.getSelectedItem());
                     if (attrib != null)
@@ -612,7 +637,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                     if (subNode.hasChildNodes()) info.setText(subNode.getFirstChild().getNodeValue());
                     else info.setText("");
                 }
-                else
+                else if (subNode != null)
                 {
                     Attr attrib = subNode.getAttributeNode(attribChoice.getSelectedItem());
                     if (attrib != null)
@@ -634,6 +659,108 @@ public class Main extends Frame implements ActionListener, WindowListener
         }
     }
 
+    public void clearTag(String name, String key) throws ParserConfigurationException, SAXException, IOException
+    {
+
+        Element node = null;
+
+        if (!hasEntry(name, -1))
+        {
+            System.err.println("No Entry for " + name);
+            return;
+        }
+
+        node = Main.instance.getEntry(name);
+
+        NodeList list;
+
+        String type = Main.instance.moves ? "MOVES" : "STATS";
+        list = node.getElementsByTagName(type);
+        Element selectedNode;
+        if (list.getLength() == 0)
+        {
+
+        }
+        else
+        {
+            selectedNode = (Element) list.item(0);
+            list = selectedNode.getElementsByTagName(key);
+            if (list.getLength() == 0)
+            {
+
+            }
+            else
+            {
+                selectedNode.removeChild(list.item(0));
+            }
+        }
+
+    }
+
+    public void editEntry(String name, String key1, String key2, String value)
+            throws ParserConfigurationException, IOException, SAXException
+    {
+
+        Element node = null;
+
+        if (!hasEntry(name, -1))
+        {
+            System.err.println("No Entry for " + name);
+            return;
+        }
+
+        node = Main.instance.getEntry(name);
+
+        NodeList list;
+
+        String type = Main.instance.moves ? "MOVES" : "STATS";
+        list = node.getElementsByTagName(type);
+        Element selectedNode;
+        if (list.getLength() == 0)
+        {
+            selectedNode = Main.instance.doc.createElement(type);
+            node.appendChild(selectedNode);
+        }
+        else
+        {
+            selectedNode = (Element) list.item(0);
+        }
+        Element subNode;
+        list = selectedNode.getElementsByTagName(key1);
+        if (list.getLength() == 0)
+        {
+            subNode = Main.instance.doc.createElement(key1);
+            selectedNode.appendChild(subNode);
+        }
+        else
+        {
+            subNode = (Element) list.item(0);
+        }
+        if (value == null) System.out.println(name + " " + key1 + " " + key2);
+
+        String attrib = key2;
+        if (attrib == null)
+        {
+            if (subNode.getFirstChild() == null)
+            {
+                Text text = Main.instance.doc.createTextNode(value);
+                subNode.appendChild(text);
+            }
+            else subNode.getFirstChild().setNodeValue(value);
+        }
+        else
+        {
+            subNode.removeAttribute(attrib);
+            if (value != null && !value.isEmpty())
+            {
+                Attr at = Main.instance.doc.createAttribute(attrib);
+                at.setValue(value);
+                subNode.setAttributeNode(at);
+            }
+        }
+
+    }
+
     Element getEntry(String name) throws ParserConfigurationException, IOException, SAXException
     {
         return getEntry(name, 0);
@@ -649,7 +776,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         return getEntry(name, number, false);
     }
 
-    boolean hasEntry(String name, int number) throws ParserConfigurationException, SAXException, IOException
+    public boolean hasEntry(String name, int number) throws ParserConfigurationException, SAXException, IOException
     {
         if (doc == null)
         {
@@ -661,7 +788,7 @@ public class Main extends Frame implements ActionListener, WindowListener
             Element pokemonNode = (Element) entries.item(i);
             int num = Integer.parseInt(pokemonNode.getAttribute("number"));
             String name2 = pokemonNode.getAttribute("name");
-            if (num == number && name2.equalsIgnoreCase(name)) return true;
+            if ((num == number || number == -1) && name2.equalsIgnoreCase(name)) return true;
         }
         return false;
     }
@@ -728,7 +855,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         boolean empty = !(element.hasChildNodes() || element.hasAttributes());
         if (empty) Thread.dumpStack();
         NodeList entries = element.getChildNodes();
-        HashSet<Element> toRemove = new HashSet<>();
+        HashSet<Object> toRemove = new HashSet<>();
         for (int i = 0; i < entries.getLength(); i++)
         {
             boolean attribs = entries.item(i).hasAttributes();
@@ -738,7 +865,7 @@ public class Main extends Frame implements ActionListener, WindowListener
             }
             else if (!attribs && (entries.item(i).getNodeValue() == null || entries.item(i).getNodeValue().isEmpty()))
             {
-                toRemove.add((Element) entries.item(i));
+                toRemove.add(entries.item(i));
             }
             else if (attribs && entries.item(i).getNodeName().equals("EVYIELD"))
             {
@@ -753,8 +880,8 @@ public class Main extends Frame implements ActionListener, WindowListener
 
             }
         }
-        for (Element oldChild : toRemove)
-            element.removeChild(oldChild);
+        for (Object oldChild : toRemove)
+            element.removeChild((Node) oldChild);
     }
 
     void writeXML(File file) throws IOException
