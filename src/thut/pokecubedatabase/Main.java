@@ -123,7 +123,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                         + ".\nModes can also have modifiers, see Gligar(207) for example of item and time requirements");
         statsNodes.put("CAPTURERATE", "The Capture Rate");
         statsNodes.put("EVOLUTIONANIMATION", "related to the colour of the evolution animation");
-        statsNodes.put("RIDDENOFFSET", "Offset for position of rider");
+//        statsNodes.put("RIDDENOFFSET", "Offset for position of rider");
         statsNodes.put("PREY", "Species this pokemon eats." + "\nFormat: <Species1> <Species2>");
         statsNodes.put("SPECIES", "Species this pokemon is." + "\nFormat: <Species1> <Species2>");
         statsNodes.put("MOVEMENTTYPE", "options:normal, floating, flying, water");
@@ -187,7 +187,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                 + "\ndye: Format: <boolean>:<number>, does the pokemob support dying, number is the default state.");
         statsNodes.put("EXPERIENCEMODE", "The function used for mapping exp to level."
                 + "\nOptions: erratic, fast, medium fast, medium slow, slow, fluctuating");
-        statsNodes.put("PARTICLEEFFECTS", "particles produced." + "\nFormat: <particle>:<rate>");
+//        statsNodes.put("PARTICLEEFFECTS", "particles produced." + "\nFormat: <particle>:<rate>");
         statsNodes.put("GENDERRATIO", "ratio of genders.\n"
                 + "Options: 255 -> No gender, 254 -> all female, 0 -> all male, otherwise fraction of 254 as male/female");
         statsNodes.put("INTERACTIONLOGIC",
