@@ -55,64 +55,64 @@ import thut.pokecubedatabase.serebii.SerebiiChecker;
 // An AWT GUI program inherits from the top-level container java.awt.Frame
 public class Main extends Frame implements ActionListener, WindowListener
 {
-    final static String defaultFile      = "pokemobs.xml";
-    public static Main  instance;
-    static File         file             = new File("./" + defaultFile);
+    final static String                   defaultFile      = "pokemobs.xml";
+    public static Main                    instance;
+    static File                           file             = new File("./" + defaultFile);
     /**
      * 
      */
-    static final long   serialVersionUID = 1L;
-    Label               lblInput;
-    Label               nodeLabel;
+    static final long                     serialVersionUID = 1L;
+    Label                                 lblInput;
+    Label                                 nodeLabel;
 
     // View Buttons
-    TextField fileName;
+    TextField                             fileName;
 
-    TextField        name;
-    public TextField number;
+    TextField                             name;
+    public TextField                      number;
 
-    Button next;
-    Button prev;
+    Button                                next;
+    Button                                prev;
 
-    Button add;
+    Button                                add;
 
-    TextField       label;
-    TextField       info;
-    public TextArea status;
+    TextField                             label;
+    TextField                             info;
+    public TextArea                       status;
 
-    Button toggle;
-    Button save;
+    Button                                toggle;
+    Button                                save;
 
     // Edit buttons
 
-    TextArea inputLabel;
+    TextArea                              inputLabel;
 
-    TextArea input;
-    Button   parse;
-    Button   clear;
+    TextArea                              input;
+    Button                                parse;
+    Button                                clear;
 
-    Choice statNodeOptions;
-    Choice moveNodeOptions;
-    Choice attribChoice;
+    Choice                                statNodeOptions;
+    Choice                                moveNodeOptions;
+    Choice                                attribChoice;
 
-    ChoiceHandler choiceHandler = new ChoiceHandler(this);
+    ChoiceHandler                         choiceHandler    = new ChoiceHandler(this);
 
-    TextField doc1;
-    TextField doc2;
-    TextField output;
+    TextField                             doc1;
+    TextField                             doc2;
+    TextField                             output;
 
-    Button merge;
+    Button                                merge;
 
-    public boolean moves = false;
+    public boolean                        moves            = false;
 
-    public Document doc;
-    public Element  node = null;
+    public Document                       doc;
+    public Element                        node             = null;
 
-    public static HashMap<String, String> statsNodes  = new HashMap<>();
-    public static HashMap<String, String> movesNodes  = new HashMap<>();
-    public static HashMap<String, String> statAttribs = new HashMap<>();
+    public static HashMap<String, String> statsNodes       = new HashMap<>();
+    public static HashMap<String, String> movesNodes       = new HashMap<>();
+    public static HashMap<String, String> statAttribs      = new HashMap<>();
 
-    SerebiiChecker serebii;
+    SerebiiChecker                        serebii;
 
     static
     {
@@ -123,7 +123,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                         + ".\nModes can also have modifiers, see Gligar(207) for example of item and time requirements");
         statsNodes.put("CAPTURERATE", "The Capture Rate");
         statsNodes.put("EVOLUTIONANIMATION", "related to the colour of the evolution animation");
-//        statsNodes.put("RIDDENOFFSET", "Offset for position of rider");
+        // statsNodes.put("RIDDENOFFSET", "Offset for position of rider");
         statsNodes.put("PREY", "Species this pokemon eats." + "\nFormat: <Species1> <Species2>");
         statsNodes.put("SPECIES", "Species this pokemon is." + "\nFormat: <Species1> <Species2>");
         statsNodes.put("MOVEMENTTYPE", "options:normal, floating, flying, water");
@@ -179,6 +179,8 @@ public class Main extends Frame implements ActionListener, WindowListener
                         + "\nlength: how long is the hitbox, Format: <length in meters>");
         statsNodes.put("EVYIELD", "evs gained from defeating this pokemon, blank values mean no EV of that stat.");
         statsNodes.put("BASESTATS", "this pokemon's base stats");
+        statsNodes.put("MEGARULES", "");
+        statsNodes.put("FORMEITEMS", "");
         statsNodes.put("LOGIC", "logic states.\n"
                 + "shoulder: should the pokemob jump on shoulder when right clicked with a stick."
                 + "\nfly: should the pokemob be able to carry player (defaulted true for flying types)"
@@ -187,7 +189,8 @@ public class Main extends Frame implements ActionListener, WindowListener
                 + "\ndye: Format: <boolean>:<number>, does the pokemob support dying, number is the default state.");
         statsNodes.put("EXPERIENCEMODE", "The function used for mapping exp to level."
                 + "\nOptions: erratic, fast, medium fast, medium slow, slow, fluctuating");
-//        statsNodes.put("PARTICLEEFFECTS", "particles produced." + "\nFormat: <particle>:<rate>");
+        // statsNodes.put("PARTICLEEFFECTS", "particles produced." + "\nFormat:
+        // <particle>:<rate>");
         statsNodes.put("GENDERRATIO", "ratio of genders.\n"
                 + "Options: 255 -> No gender, 254 -> all female, 0 -> all male, otherwise fraction of 254 as male/female");
         statsNodes.put("INTERACTIONLOGIC",
@@ -205,6 +208,8 @@ public class Main extends Frame implements ActionListener, WindowListener
         statAttribs.put("SIZES", "height,length,width");
         statAttribs.put("BASESTATS", "hp,atk,def,spatk,spdef,spd");
         statAttribs.put("EVYIELD", "hp,atk,def,spatk,spdef,spd");
+        statAttribs.put("FORMEITEMS", "forme");
+        statAttribs.put("MEGARULES", "forme");
 
         movesNodes.put("LVLUP", "moves learned on lvl up");
         movesNodes.put("MISC", "any other obtainable move");
