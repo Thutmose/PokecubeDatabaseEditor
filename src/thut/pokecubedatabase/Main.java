@@ -202,7 +202,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         statsNodes.put("ACTIVETIMES",
                 "list of times this pokemon is active." + "\nDefault: all day. valid options: day, night, dusk, dawn");
 
-        statAttribs.put("LOGIC", "shoulder" + "," + "fly" + "," + "dive" + "," + "dye" + "," + "stationary");
+        statAttribs.put("LOGIC", "shoulder" + "," + "fly" + "," + "dive" + "," + "dye" + "," + "stationary"+","+"surf");
         statAttribs.put("TYPE", "type1,type2");
         statAttribs.put("ABILITY", "normal,hidden");
         statAttribs.put("SIZES", "height,length,width");
