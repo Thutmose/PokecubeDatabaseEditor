@@ -3,11 +3,14 @@ package thut.pokecubedatabase;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Comparator;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+
+import thut.pokecubedatabase.XMLEntries.XMLPokedexEntry;
 
 public class AddHandler implements ActionListener
 {
@@ -40,41 +43,35 @@ public class AddHandler implements ActionListener
                     Main.instance.status.setText("ADDED NEW ENTRY: " + newname);
                 }
             }
-            catch (ParserConfigurationException | SAXException | IOException e)
+            catch (ParserConfigurationException | SAXException | IOException | JAXBException e)
             {
-                String mess = e + "";
-                for (Object o : e.getStackTrace())
-                {
-                    mess += "\n" + o;
-                }
-                Main.instance.status.append(mess);
+                e.printStackTrace();
             }
-
         }
     }
-    
 
-    Element appendPokemon(int number, String name) throws ParserConfigurationException, IOException, SAXException
+    boolean appendPokemon(int number, String name) throws JAXBException
     {
-        Element first = Main.instance.getEntry(null, -1, false);
-        Element next = Main.instance.getEntry(null, number + 1, false);
-        Element document = Main.instance.doc.getDocumentElement();
-        Element ret = Main.instance.doc.createElement("Pokemon");
-        ret.setAttribute("name", name);
-        ret.setAttribute("number", "" + number);
-
-        boolean append = first == next;
-        if (append)
+        XMLPokedexEntry entry = new XMLPokedexEntry();
+        entry.name = name;
+        entry.number = number + "";
+        XMLEntries.getDatabase(Main.file).pokemon.add(entry);
+        XMLEntries.getDatabase(Main.file).pokemon.sort(new Comparator<XMLPokedexEntry>()
         {
-            document.appendChild(ret);
-        }
-        else
-        {
-            document.insertBefore(ret, next);
-        }
-
+            @Override
+            public int compare(XMLPokedexEntry o1, XMLPokedexEntry o2)
+            {
+                if (o1.number.compareTo(o2.number) != 0) return o1.number.compareTo(o2.number);
+                int diff = 0;
+                if (Boolean.parseBoolean(o1.base) && !Boolean.parseBoolean(o2.base)) diff = -1;
+                else if (Boolean.parseBoolean(o2.base) && !Boolean.parseBoolean(o1.base)) diff = 1;
+                if (diff != 0) return diff;
+                return o1.name.compareTo(o2.name);
+            }
+        });
+        XMLEntries.getDatabase(Main.file).init();
         Main.instance.writeXML(Main.file);
-        return ret;
+        return entry != null;
     }
 
 }

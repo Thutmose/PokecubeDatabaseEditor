@@ -19,12 +19,12 @@ public class SerebiiChecker
 {
     public static final int TOTALCOUNT = 721;
 
-    static HashSet<String> movesets = new HashSet<>();
+    static HashSet<String>  movesets   = new HashSet<>();
 
-    public Panel  panel;
-    Button        update;
-    Button        mode;
-    ButtonHandler handler;
+    public Panel            panel;
+    Button                  update;
+    Button                  mode;
+    ButtonHandler           handler;
 
     static
     {
@@ -94,6 +94,7 @@ public class SerebiiChecker
         if (name == null) return;
 
         PokedexEntry entry = new PokedexEntry(name, num);
+        Main.instance.status.setText("Updating " + name);
         boolean gender = false;
         boolean stats = false;
         boolean lvlup = false;
@@ -129,7 +130,7 @@ public class SerebiiChecker
                                     try
                                     {
                                         typeName = Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
-                                        entry.types[n++] = typeName;
+                                        entry.setType(n++, typeName);
                                     }
                                     catch (Exception e)
                                     {
@@ -157,7 +158,7 @@ public class SerebiiChecker
                     for (int k = 1; k <= 6; k++)
                     {
                         Element stat = rowItems.get(k + j);
-                        entry.baseStats[k - 1] = Integer.parseInt(stat.text().trim());
+                        entry.setBaseStat(k - 1, stat.text().trim());
                     }
                 }
                 if (gender && !lvlup && text.length() < 40 && text.contains("Level Up") && !text.contains("X & Y")
@@ -165,6 +166,7 @@ public class SerebiiChecker
                 {
                     lvlup = true;
                     int indexIn = j + 1;
+                    entry.entry.moves.lvlupMoves.values.clear();
                     indexIn = parseLevelMoves(indexIn, rowItems, entry);
                     Element move = rowItems.get(indexIn);
                     parseMoves(move.text(), indexIn, rowItems, entry);
@@ -172,6 +174,7 @@ public class SerebiiChecker
             }
         }
         entry.editDatabase();
+        Main.instance.status.setText("Updated " + name);
     }
 
     private boolean isTypeField(String input)
@@ -224,7 +227,7 @@ public class SerebiiChecker
             String attack = move.text();
             String info = rowItems.get(index - 1).text();
             if (!(info.contains("TM") || info.contains("HM"))) break;
-            entry.otherMoves.add(attack);
+            entry.addOtherMove(attack);
             index += 9;
             tms = true;
         }
@@ -246,7 +249,7 @@ public class SerebiiChecker
             if (isMoveSection(rowItems.get(index).text())) break;
             valid = true;
             String attack = move.text();
-            entry.otherMoves.add(attack);
+            entry.addOtherMove(attack);
             index += 9;
         }
         if (valid) indexIn = index;
@@ -264,7 +267,7 @@ public class SerebiiChecker
             if (isMoveSection(rowItems.get(index + 1).text()) || isMoveSection(move.text())) break;
             valid = true;
             String attack = move.text();
-            entry.otherMoves.add(attack);
+            entry.addOtherMove(attack);
             index += 9;
         }
         if (valid) indexIn = index;
@@ -283,7 +286,7 @@ public class SerebiiChecker
             if (isMoveSection(rowItems.get(index + 1).text()) || isMoveSection(rowItems.get(index).text())) break;
             valid = true;
             String attack = move.text();
-            entry.otherMoves.add(attack);
+            entry.addOtherMove(attack);
             index += 8;
         }
         if (valid) indexIn = index;
@@ -302,7 +305,7 @@ public class SerebiiChecker
             String attack = move.text();
             if (isMoveSection(attack)) break;
             cont = !isMoveSection(rowItems.get(index + 10).text());
-            entry.otherMoves.add(attack);
+            entry.addOtherMove(attack);
             valid = true;
             index += 9;
         }
@@ -322,7 +325,7 @@ public class SerebiiChecker
             String attack = move.text();
             if (isMoveSection(attack)) break;
             cont = !isMoveSection(rowItems.get(index + 12).text());
-            entry.otherMoves.add(attack);
+            entry.addOtherMove(attack);
             valid = true;
             index += 11;
         }
@@ -348,7 +351,7 @@ public class SerebiiChecker
             catch (NumberFormatException e)
             {
             }
-            entry.lvlMoves.add(l + ":" + rowItems.get(indexIn + 1).text());
+            entry.addLvlMove(l, rowItems.get(indexIn + 1).text());
             indexIn += 9;
         }
         return indexIn;

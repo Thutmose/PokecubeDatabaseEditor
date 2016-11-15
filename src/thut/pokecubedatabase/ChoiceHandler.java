@@ -9,11 +9,15 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import javax.xml.namespace.QName;
+
+import thut.pokecubedatabase.XMLEntries.Moves;
+import thut.pokecubedatabase.XMLEntries.Moves.LvlUp;
+import thut.pokecubedatabase.XMLEntries.XMLPokedexEntry;
 
 public class ChoiceHandler implements ItemListener, FocusListener, ComponentListener, MouseListener, MouseMotionListener
 {
@@ -44,69 +48,66 @@ public class ChoiceHandler implements ItemListener, FocusListener, ComponentList
         if (arg0 == null || arg0.getSource() == main.statNodeOptions || arg0.getSource() == main.moveNodeOptions)
         {
             main.attribChoice.removeAll();
-            String nodeName = main.moves ? main.moveNodeOptions.getSelectedItem()
+            String selectedItem = main.moves ? main.moveNodeOptions.getSelectedItem()
                     : main.statNodeOptions.getSelectedItem();
-            String var;
-            if (!main.moves && (var = Main.statAttribs.get(nodeName)) != null)
+            XMLPokedexEntry entry = Main.currentEntry;
+
+            if (entry == null)
             {
-                String[] attrib = var.split(",");
-                for (String s : attrib)
+                String text = main.name.getText();
+                entry = main.getEntry(text);
+            }
+            if (entry == null)
+            {
+                int num = Integer.parseInt(main.number.getText());
+                entry = main.getEntry(num);
+            }
+
+            if (!main.moves)
+            {
+                if (Main.validAttribs.containsKey(selectedItem))
                 {
-                    main.attribChoice.add(s);
+                    for (String s : Main.validAttribs.get(selectedItem))
+                    {
+                        main.attribChoice.add(s);
+                    }
                 }
             }
-            else if(main.moves)
+            else
             {
-                if (nodeName.equals("MISC"))
+                Field selected = null;
+                try
                 {
-                    main.attribChoice.add("moves");
-                }
-                else
-                {
-                    NodeList list = main.node.getElementsByTagName("MOVES");
-                    Element movesNode;
-                    if (list.getLength() == 0)
+                    selected = Moves.class.getDeclaredField(selectedItem);
+                    Object value = selected.get(entry.moves);
+                    if (value instanceof LvlUp)
                     {
-                        movesNode = main.doc.createElement("MOVES");
-                        main.node.appendChild(movesNode);
-                    }
-                    else
-                    {
-                        movesNode = (Element) list.item(0);
-                    }
+                        LvlUp lvl = (LvlUp) value;
 
-                    Element subNode;
-
-                    list = movesNode.getElementsByTagName(main.moveNodeOptions.getSelectedItem());
-                    if (list.getLength() == 0)
-                    {
-                        subNode = main.doc.createElement(main.moveNodeOptions.getSelectedItem());
-                        movesNode.appendChild(subNode);
-                    }
-                    else
-                    {
-                        subNode = (Element) list.item(0);
-                    }
-                    ArrayList<String> levels = new ArrayList<>();
-                    for (int i = 0; i < subNode.getAttributes().getLength(); i++)
-                    {
-                        levels.add(subNode.getAttributes().item(i).getNodeName());
-                    }
-                    levels.sort(new Comparator<String>()
-                    {
-                        @Override
-                        public int compare(String o1, String o2)
+                        ArrayList<String> levels = new ArrayList<>();
+                        for (QName n : lvl.values.keySet())
                         {
-                            int num1 = Integer.parseInt(o1.replace("lvl_", ""));
-                            int num2 = Integer.parseInt(o2.replace("lvl_", ""));
-                            return num1 - num2;
+                            levels.add(n.toString());
                         }
-                    });
-                    for(String l: levels)
-                    {
-                        main.attribChoice.add(l);
+                        levels.sort(new Comparator<String>()
+                        {
+                            @Override
+                            public int compare(String o1, String o2)
+                            {
+                                int num1 = Integer.parseInt(o1.replace("lvl_", ""));
+                                int num2 = Integer.parseInt(o2.replace("lvl_", ""));
+                                return num1 - num2;
+                            }
+                        });
+                        for (String s : levels)
+                        {
+                            main.attribChoice.add(s);
+                        }
                     }
-
+                }
+                catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e)
+                {
+                    e.printStackTrace();
                 }
             }
         }
