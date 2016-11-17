@@ -17,14 +17,16 @@ import thut.pokecubedatabase.Main;
 
 public class SerebiiChecker
 {
-    public static final int TOTALCOUNT = 721;
+    public static int      TOTALCOUNT = 801;
 
-    static HashSet<String>  movesets   = new HashSet<>();
+    static HashSet<String> movesets   = new HashSet<>();
+    public static String   pokedex    = "pokedex-sm";   // pokedex-xy
+    public static String   typeLoc    = "pokedex-bw";
 
-    public Panel            panel;
-    Button                  update;
-    Button                  mode;
-    ButtonHandler           handler;
+    public Panel           panel;
+    Button                 update;
+    Button                 mode;
+    ButtonHandler          handler;
 
     static
     {
@@ -67,7 +69,7 @@ public class SerebiiChecker
         if (numStr.length() == 1) numStr = "00" + numStr;
         else if (numStr.length() == 2) numStr = "0" + numStr;
         // Make a URL to the web page
-        String html = "http://www.serebii.net/pokedex-xy/" + numStr + ".shtml";
+        String html = "http://www.serebii.net/" + pokedex + "/" + numStr + ".shtml";
 
         Document doc = Jsoup.connect(html).get();
         doc.outputSettings().escapeMode(EscapeMode.xhtml);
@@ -126,7 +128,7 @@ public class SerebiiChecker
                                 if (node.childNodeSize() > 0)
                                 {
                                     String typeName = node.childNode(0).attr("src").replace(".gif", "")
-                                            .replace("/pokedex-bw/type/", "");
+                                            .replace("/" + typeLoc + "/type/", "");
                                     try
                                     {
                                         typeName = Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
@@ -187,27 +189,75 @@ public class SerebiiChecker
         int newIndex = indexIn;
         if (header.contains("TM & HM Attacks"))
         {
-            newIndex = parseTMMoves(indexIn, rowItems, entry);
+            try
+            {
+                newIndex = parseTMMoves(indexIn, rowItems, entry);
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         else if (header.contains("Pre-Evolution Only Moves"))
         {
-            newIndex = parsePreEvoMoves(indexIn, rowItems, entry);
+            try
+            {
+                newIndex = parsePreEvoMoves(indexIn, rowItems, entry);
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         else if (header.contains("Egg Moves"))
         {
-            newIndex = parseEggMoves(indexIn, rowItems, entry);
+            try
+            {
+                newIndex = parseEggMoves(indexIn, rowItems, entry);
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         else if (header.contains("Move Tutor"))
         {
-            newIndex = parseMoveTutor(indexIn, rowItems, entry);
+            try
+            {
+                newIndex = parseMoveTutor(indexIn, rowItems, entry);
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         else if (header.contains("Transfer Only"))
         {
-            newIndex = parseTransferMoves(indexIn, rowItems, entry);
+            try
+            {
+                newIndex = parseTransferMoves(indexIn, rowItems, entry);
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         else if (header.contains("Special Moves"))
         {
-            newIndex = parseSpecialMoves(indexIn, rowItems, entry);
+            try
+            {
+                newIndex = parseSpecialMoves(indexIn, rowItems, entry);
+            }
+            catch (Exception e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         if (indexIn != newIndex)
         {

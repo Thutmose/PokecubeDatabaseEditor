@@ -61,7 +61,9 @@ public class AddHandler implements ActionListener
             @Override
             public int compare(XMLPokedexEntry o1, XMLPokedexEntry o2)
             {
-                if (o1.number.compareTo(o2.number) != 0) return o1.number.compareTo(o2.number);
+                int num1 = Integer.parseInt(o1.number);
+                int num2 = Integer.parseInt(o2.number);
+                if (num1 != num2) return num1 - num2;
                 int diff = 0;
                 if (Boolean.parseBoolean(o1.base) && !Boolean.parseBoolean(o2.base)) diff = -1;
                 else if (Boolean.parseBoolean(o2.base) && !Boolean.parseBoolean(o1.base)) diff = 1;

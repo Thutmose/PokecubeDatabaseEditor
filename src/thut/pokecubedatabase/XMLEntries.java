@@ -97,7 +97,7 @@ public class XMLEntries
         public static class LvlUp
         {
             @XmlAnyAttribute
-            public Map<QName, String> values;
+            public Map<QName, String> values = new HashMap<>();
         }
 
         @XmlRootElement(name = "MISC")
@@ -126,7 +126,7 @@ public class XMLEntries
         public static class Stats
         {
             @XmlAnyAttribute
-            public Map<QName, String> values;
+            public Map<QName, String> values = new HashMap<>();
         }
 
         @XmlAttribute
@@ -230,7 +230,7 @@ public class XMLEntries
             return ret;
         }
 
-        public XMLPokedexEntry getEntry(String name, int number, boolean checkFormes)
+        public XMLPokedexEntry getEntry(String name, int number, boolean checkFormes, int default_)
         {
             boolean checkNum = number > 0;
             boolean checkName = name != null;
@@ -243,7 +243,12 @@ public class XMLEntries
                         && (checkFormes || Boolean.parseBoolean(test.base)))
                     return test;
             }
-            return pokemon.get(0);
+            return default_ >= 0 ? pokemon.get(0) : null;
+        }
+
+        public XMLPokedexEntry getEntry(String name, int number, boolean checkFormes)
+        {
+            return getEntry(name, number, checkFormes, 0);
         }
     }
 

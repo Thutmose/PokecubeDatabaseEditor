@@ -20,7 +20,7 @@ public class ButtonHandler implements ActionListener
         {
             if (serebii.mode.getActionCommand().equals("All"))
             {
-                for (int i = 1; i <= 721; i++)
+                for (int i = 722; i <= SerebiiChecker.TOTALCOUNT; i++)
                     serebii.updateFromSerebii(i);
             }
             else

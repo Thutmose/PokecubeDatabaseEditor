@@ -1,5 +1,6 @@
 package thut.pokecubedatabase.serebii;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,22 +28,59 @@ public class PokedexEntry
         this.entry = entry;
     }
 
+    public void initField(Field f, Object obj) throws InstantiationException, IllegalAccessException
+    {
+        if (f.getType() != String.class && f.get(obj) == null && !f.getType().isInterface()
+                && !f.getName().equals("body"))
+        {
+            Class<?> c1 = f.getType();
+            Object o1 = c1.newInstance();
+            f.set(obj, o1);
+            for (Field f1 : c1.getFields())
+            {
+                try
+                {
+                    if (f1.get(o1) == null) initField(f1, o1);
+                }
+                catch (Exception e)
+                {
+                    System.err.println("Error with " + f1.getName() + " " + f1.getType() + " " + f1.get(o1));
+                }
+            }
+        }
+    }
+
     public PokedexEntry(String name, int number)
     {
-        XMLPokedexEntry old = XMLEntries.getDatabase(Main.file).getEntry(name, number, false);
+        XMLPokedexEntry old = XMLEntries.getDatabase(Main.file).getEntry(name, number, false, -1);
         if (old != null) entry = old;
         else
         {
             entry = new XMLPokedexEntry();
+            System.out.println("Creating new Entry for " + name);
             entry.name = name;
             entry.number = number + "";
+            entry.base = "true";
+            for (Field f : XMLPokedexEntry.class.getFields())
+            {
+                try
+                {
+                    initField(f, entry);
+                }
+                catch (Exception e)
+                {
+                    System.err.println("Error with " + f.getName());
+                }
+            }
             XMLEntries.getDatabase(Main.file).pokemon.add(entry);
             XMLEntries.getDatabase(Main.file).pokemon.sort(new Comparator<XMLPokedexEntry>()
             {
                 @Override
                 public int compare(XMLPokedexEntry o1, XMLPokedexEntry o2)
                 {
-                    if (o1.number.compareTo(o2.number) != 0) return o1.number.compareTo(o2.number);
+                    int num1 = Integer.parseInt(o1.number);
+                    int num2 = Integer.parseInt(o2.number);
+                    if (num1 != num2) return num1 - num2;
                     int diff = 0;
                     if (Boolean.parseBoolean(o1.base) && !Boolean.parseBoolean(o2.base)) diff = -1;
                     else if (Boolean.parseBoolean(o2.base) && !Boolean.parseBoolean(o1.base)) diff = 1;
