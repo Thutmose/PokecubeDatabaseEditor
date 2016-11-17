@@ -1,4 +1,4 @@
-package thut.pokecubedatabase;
+package thut.pokecubedatabase.pokedex;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,9 +6,10 @@ import java.lang.reflect.Field;
 
 import javax.xml.namespace.QName;
 
-import thut.pokecubedatabase.XMLEntries.StatsNode;
-import thut.pokecubedatabase.XMLEntries.StatsNode.Stats;
-import thut.pokecubedatabase.XMLEntries.XMLPokedexEntry;
+import thut.pokecubedatabase.Main;
+import thut.pokecubedatabase.pokedex.XMLEntries.StatsNode;
+import thut.pokecubedatabase.pokedex.XMLEntries.StatsNode.Stats;
+import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 
 public class ParseHandler implements ActionListener
 {
@@ -95,18 +96,6 @@ public class ParseHandler implements ActionListener
     private void parseMoves()
     {
 
-    }
-
-    public static String convertName(String string)
-    {
-        String ret = "";
-        String name = string.trim().toLowerCase().replaceAll("[^\\w\\s ]", "");
-        String[] args = name.split(" ");
-        for (int i = 0; i < args.length; i++)
-        {
-            ret += args[i];
-        }
-        return ret.toUpperCase();
     }
 
 }

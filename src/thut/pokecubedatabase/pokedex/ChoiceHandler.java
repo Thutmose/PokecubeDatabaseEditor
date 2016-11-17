@@ -1,4 +1,4 @@
-package thut.pokecubedatabase;
+package thut.pokecubedatabase.pokedex;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -15,9 +15,10 @@ import java.util.Comparator;
 
 import javax.xml.namespace.QName;
 
-import thut.pokecubedatabase.XMLEntries.Moves;
-import thut.pokecubedatabase.XMLEntries.Moves.LvlUp;
-import thut.pokecubedatabase.XMLEntries.XMLPokedexEntry;
+import thut.pokecubedatabase.Main;
+import thut.pokecubedatabase.pokedex.XMLEntries.Moves;
+import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
+import thut.pokecubedatabase.pokedex.XMLEntries.Moves.LvlUp;
 
 public class ChoiceHandler implements ItemListener, FocusListener, ComponentListener, MouseListener, MouseMotionListener
 {

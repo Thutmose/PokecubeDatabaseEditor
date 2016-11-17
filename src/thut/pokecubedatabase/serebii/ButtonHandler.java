@@ -21,12 +21,12 @@ public class ButtonHandler implements ActionListener
             if (serebii.mode.getActionCommand().equals("All"))
             {
                 for (int i = 722; i <= SerebiiChecker.TOTALCOUNT; i++)
-                    serebii.updateFromSerebii(i);
+                    serebii.updatePokedexEntryFromSerebii(i);
             }
             else
             {
                 int num = Integer.parseInt(Main.instance.number.getText());
-                serebii.updateFromSerebii(num);
+                serebii.updatePokedexEntryFromSerebii(num);
             }
             return;
         }

@@ -13,10 +13,10 @@ import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
+import pokecube.core.database.moves.json.JsonMoves;
 import thut.pokecubedatabase.Main;
-import thut.pokecubedatabase.ParseHandler;
-import thut.pokecubedatabase.XMLEntries;
-import thut.pokecubedatabase.XMLEntries.XMLPokedexEntry;
+import thut.pokecubedatabase.pokedex.XMLEntries;
+import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 
 public class PokedexEntry
 {
@@ -52,7 +52,7 @@ public class PokedexEntry
 
     public PokedexEntry(String name, int number)
     {
-        XMLPokedexEntry old = XMLEntries.getDatabase(Main.file).getEntry(name, number, false, -1);
+        XMLPokedexEntry old = XMLEntries.getDatabase(Main.pokedexfile).getEntry(name, number, false, -1);
         if (old != null) entry = old;
         else
         {
@@ -72,8 +72,8 @@ public class PokedexEntry
                     System.err.println("Error with " + f.getName());
                 }
             }
-            XMLEntries.getDatabase(Main.file).pokemon.add(entry);
-            XMLEntries.getDatabase(Main.file).pokemon.sort(new Comparator<XMLPokedexEntry>()
+            XMLEntries.getDatabase(Main.pokedexfile).pokemon.add(entry);
+            XMLEntries.getDatabase(Main.pokedexfile).pokemon.sort(new Comparator<XMLPokedexEntry>()
             {
                 @Override
                 public int compare(XMLPokedexEntry o1, XMLPokedexEntry o2)
@@ -88,7 +88,7 @@ public class PokedexEntry
                     return o1.name.compareTo(o2.name);
                 }
             });
-            XMLEntries.getDatabase(Main.file).init();
+            XMLEntries.getDatabase(Main.pokedexfile).init();
         }
     }
 
@@ -206,7 +206,7 @@ public class PokedexEntry
 
     public void addLvlMove(int lvl, String move)
     {
-        entry.moves.lvlupMoves.values.put(new QName("lvl_" + lvl), ParseHandler.convertName(move));
+        entry.moves.lvlupMoves.values.put(new QName("lvl_" + lvl), JsonMoves.convertMoveName(move));
     }
 
     public void addOtherMove(String move)
@@ -221,8 +221,8 @@ public class PokedexEntry
 
             Set<String> moveset = new HashSet<>();
             for (String s : moves)
-                moveset.add(ParseHandler.convertName(s));
-            move = ParseHandler.convertName(move);
+                moveset.add(JsonMoves.convertMoveName(s));
+            move = JsonMoves.convertMoveName(move);
             moveset.add(move);
             List<String> movesList = new ArrayList<>(moveset);
             Collections.sort(movesList);

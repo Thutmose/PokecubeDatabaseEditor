@@ -1,4 +1,4 @@
-package thut.pokecubedatabase;
+package thut.pokecubedatabase.pokedex;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,7 +22,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 
-import thut.pokecubedatabase.XMLEntries.StatsNode.Stats;
+import pokecube.core.database.moves.json.JsonMoves;
+import thut.pokecubedatabase.pokedex.XMLEntries.StatsNode.Stats;
 
 public class XMLEntries
 {
@@ -425,7 +426,7 @@ public class XMLEntries
                 String[] moves = entry.moves.misc.moves.split(", ");
                 Set<String> moveset = new HashSet<>();
                 for (String s : moves)
-                    moveset.add(ParseHandler.convertName(s));
+                    moveset.add(JsonMoves.convertMoveName(s));
                 List<String> movesList = new ArrayList<>(moveset);
                 Collections.sort(movesList);
                 entry.moves.misc.moves = movesList.get(0);
@@ -438,7 +439,7 @@ public class XMLEntries
                 Map<QName, String> updated = new HashMap<QName, String>();
                 for (QName key : keys)
                 {
-                    updated.put(key, ParseHandler.convertName(entry.moves.lvlupMoves.values.get(key)));
+                    updated.put(key, JsonMoves.convertMoveName(entry.moves.lvlupMoves.values.get(key)));
                 }
                 for (QName key : keys)
                 {

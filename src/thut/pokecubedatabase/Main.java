@@ -18,9 +18,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,97 +26,41 @@ import java.util.HashMap;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
-
-import thut.pokecubedatabase.XMLEntries.Moves;
-import thut.pokecubedatabase.XMLEntries.Moves.LvlUp;
-import thut.pokecubedatabase.XMLEntries.StatsNode;
-import thut.pokecubedatabase.XMLEntries.StatsNode.Stats;
-import thut.pokecubedatabase.XMLEntries.XMLPokedexEntry;
+import thut.pokecubedatabase.pokedex.AddHandler;
+import thut.pokecubedatabase.pokedex.ChoiceHandler;
+import thut.pokecubedatabase.pokedex.ParseHandler;
+import thut.pokecubedatabase.pokedex.XMLEntries;
+import thut.pokecubedatabase.pokedex.XMLEntries.Moves;
+import thut.pokecubedatabase.pokedex.XMLEntries.Moves.LvlUp;
+import thut.pokecubedatabase.pokedex.XMLEntries.StatsNode;
+import thut.pokecubedatabase.pokedex.XMLEntries.StatsNode.Stats;
+import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 import thut.pokecubedatabase.serebii.SerebiiChecker;
 
 // An AWT GUI program inherits from the top-level container java.awt.Frame
 public class Main extends Frame implements ActionListener, WindowListener
 {
-    static class XmlFormatter
-    {
 
-        public XmlFormatter()
-        {
-        }
-
-        public String format(String unformattedXml)
-        {
-            try
-            {
-                unformattedXml = unformattedXml.replace("\n", "");
-                unformattedXml = unformattedXml.replace("( )+(<)", "<");
-
-                final Document document = parseXmlFile(unformattedXml);
-
-                OutputFormat format = new OutputFormat(document);
-                // format.setLineWidth(65);
-                format.setIndenting(true);
-                format.setIndent(4);
-                Writer out = new StringWriter();
-                XMLSerializer serializer = new XMLSerializer(out, format);
-                serializer.serialize(document);
-
-                return out.toString();
-            }
-            catch (IOException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-
-        Document parseXmlFile(String in)
-        {
-            try
-            {
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                InputSource is = new InputSource(new StringReader(in));
-                return db.parse(is);
-            }
-            catch (ParserConfigurationException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (SAXException e)
-            {
-                throw new RuntimeException(e);
-            }
-            catch (IOException e)
-            {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    final static String                     defaultFile      = "pokemobs.xml";
+    final static String                     defaultPokemobsFile = "pokemobs.xml";
+    final static String                     defaultMovesFile    = "moves.json";
     public static Main                      instance;
-    public static File                      file             = new File("./" + defaultFile);
-    public static XMLPokedexEntry           currentEntry     = null;
+    public static File                      pokedexfile         = new File("./" + defaultPokemobsFile);
+    public static File                      movesFile           = new File("./" + defaultMovesFile);
+    public static XMLPokedexEntry           currentEntry        = null;
     /**
      * 
      */
-    static final long                       serialVersionUID = 1L;
-    public static HashMap<String, String>   statsNodes       = new HashMap<>();
-    public static HashMap<String, String>   statsNodeNames   = new HashMap<>();
-    public static HashMap<String, String>   movesNodes       = new HashMap<>();
-    public static HashMap<String, String>   movesNodesNames  = new HashMap<>();
-    public static HashMap<String, String[]> validAttribs     = new HashMap<>();
-    public static final String[]            statsNames       = { "hp", "atk", "def", "spatk", "spdef", "spd" };
+    static final long                       serialVersionUID    = 1L;
+    public static HashMap<String, String>   statsNodes          = new HashMap<>();
+    public static HashMap<String, String>   statsNodeNames      = new HashMap<>();
+    public static HashMap<String, String>   movesNodes          = new HashMap<>();
+    public static HashMap<String, String>   movesNodesNames     = new HashMap<>();
+    public static HashMap<String, String[]> validAttribs        = new HashMap<>();
+    public static final String[]            statsNames          = { "hp", "atk", "def", "spatk", "spdef", "spd" };
 
     static
     {
@@ -199,47 +140,31 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     Label            lblInput;
     Label            nodeLabel;
-    // View Buttons
     TextField        fileName;
-
-    TextField        name;
+    public TextField name;
     public TextField number;
-
     // Edit buttons
-
     Button           next;
-
     Button           prev;
-    Button           add;
+    public Button    add;
     TextField        label;
-
-    TextField        info;
+    public TextField info;
     public TextArea  status;
     Button           toggle;
-
     Button           save;
-
-    TextArea         inputLabel;
-    TextArea         input;
-    Button           parse;
-
+    public TextArea  inputLabel;
+    public TextArea  input;
+    public Button    parse;
     Button           clear;
-
-    Choice           statNodeOptions;
-
-    Choice           moveNodeOptions;
-    Choice           attribChoice;
-
+    public Choice    statNodeOptions;
+    public Choice    moveNodeOptions;
+    public Choice    attribChoice;
     ChoiceHandler    choiceHandler = new ChoiceHandler(this);
     TextField        doc1;
     TextField        doc2;
-
     TextField        output;
-
     Button           merge;
-
     public boolean   moves         = false;
-
     SerebiiChecker   serebii;
 
     public Main()
@@ -254,7 +179,7 @@ public class Main extends Frame implements ActionListener, WindowListener
 
         Panel file = new Panel(new GridLayout(3, 1));
         file.add(new Label("File"));
-        file.add(fileName = new TextField(defaultFile));
+        file.add(fileName = new TextField(defaultPokemobsFile));
         file.add(save = new Button("Save"));
         save.addActionListener(this);
         fileName.addActionListener(this);
@@ -409,7 +334,7 @@ public class Main extends Frame implements ActionListener, WindowListener
             try
             {
                 status.setText("Saving Changes, please wait...");
-                writeXML(file);
+                writeXML(pokedexfile);
                 getEntry(0);
                 status.setText("Done Saving");
             }
@@ -431,12 +356,12 @@ public class Main extends Frame implements ActionListener, WindowListener
         moveNodeOptions.setEnabled(moves);
         if (evt.getSource() == fileName)
         {
-            file = null;
-            file = new File("./" + fileName.getText());
+            pokedexfile = null;
+            pokedexfile = new File("./" + fileName.getText());
 
-            if (!file.exists())
+            if (!pokedexfile.exists())
             {
-                file = new File("./" + fileName.getText() + ".xml");
+                pokedexfile = new File("./" + fileName.getText() + ".xml");
             }
             name.setText("");
             number.setText("");
@@ -471,12 +396,12 @@ public class Main extends Frame implements ActionListener, WindowListener
         updateBoxes(evt.getSource());
     }
 
-    XMLPokedexEntry getEntry(int number)
+    public XMLPokedexEntry getEntry(int number)
     {
         return getEntry(null, number);
     }
 
-    XMLPokedexEntry getEntry(String name)
+    public XMLPokedexEntry getEntry(String name)
     {
         return getEntry(name, 0);
     }
@@ -493,7 +418,7 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     XMLPokedexEntry getEntry(String name, int number, boolean newDoc, boolean checkFormes)
     {
-        return XMLEntries.getDatabase(file).getEntry(name, number, checkFormes);
+        return XMLEntries.getDatabase(pokedexfile).getEntry(name, number, checkFormes);
     }
 
     String getNameFromNumber(int number) throws NullPointerException
@@ -509,13 +434,13 @@ public class Main extends Frame implements ActionListener, WindowListener
 
     public boolean hasEntry(String name, int number, boolean checkFormes)
     {
-        return XMLEntries.getDatabase(file).getEntry(name, number, checkFormes) != null;
+        return XMLEntries.getDatabase(pokedexfile).getEntry(name, number, checkFormes) != null;
     }
 
     XMLPokedexEntry nextEntry(String name, int dir)
     {
         XMLPokedexEntry entry = getEntry(name, -1, false, true);
-        return XMLEntries.getDatabase(file).next(entry, dir);
+        return XMLEntries.getDatabase(pokedexfile).next(entry, dir);
     }
 
     void renameTextures()
@@ -537,7 +462,7 @@ public class Main extends Frame implements ActionListener, WindowListener
         }
     }
 
-    void updateBoxes(Object source)
+    public void updateBoxes(Object source)
     {
 
         statNodeOptions.setEnabled(!moves);
@@ -667,7 +592,7 @@ public class Main extends Frame implements ActionListener, WindowListener
     {
     }
 
-    void writeXML(File file) throws JAXBException
+    public void writeXML(File file) throws JAXBException
     {
         XMLEntries.write(file);
     }

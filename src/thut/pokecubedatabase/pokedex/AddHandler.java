@@ -1,4 +1,4 @@
-package thut.pokecubedatabase;
+package thut.pokecubedatabase.pokedex;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,7 +10,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import thut.pokecubedatabase.XMLEntries.XMLPokedexEntry;
+import thut.pokecubedatabase.Main;
+import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 
 public class AddHandler implements ActionListener
 {
@@ -55,8 +56,8 @@ public class AddHandler implements ActionListener
         XMLPokedexEntry entry = new XMLPokedexEntry();
         entry.name = name;
         entry.number = number + "";
-        XMLEntries.getDatabase(Main.file).pokemon.add(entry);
-        XMLEntries.getDatabase(Main.file).pokemon.sort(new Comparator<XMLPokedexEntry>()
+        XMLEntries.getDatabase(Main.pokedexfile).pokemon.add(entry);
+        XMLEntries.getDatabase(Main.pokedexfile).pokemon.sort(new Comparator<XMLPokedexEntry>()
         {
             @Override
             public int compare(XMLPokedexEntry o1, XMLPokedexEntry o2)
@@ -71,8 +72,8 @@ public class AddHandler implements ActionListener
                 return o1.name.compareTo(o2.name);
             }
         });
-        XMLEntries.getDatabase(Main.file).init();
-        Main.instance.writeXML(Main.file);
+        XMLEntries.getDatabase(Main.pokedexfile).init();
+        Main.instance.writeXML(Main.pokedexfile);
         return entry != null;
     }
 
