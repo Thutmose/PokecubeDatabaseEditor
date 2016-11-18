@@ -149,7 +149,7 @@ public class Main extends Frame implements ActionListener, WindowListener
     public Button    add;
     TextField        label;
     public TextField info;
-    public TextArea  status;
+    private TextArea status;
     Button           toggle;
     Button           save;
     public TextArea  inputLabel;
@@ -324,19 +324,34 @@ public class Main extends Frame implements ActionListener, WindowListener
         setVisible(true);
     }
 
+    public void clearStatus()
+    {
+        status.setText("");
+    }
+
+    public void addToStatus(String toAdd)
+    {
+        status.append("\n"+toAdd);
+    }
+
+    public void setStatus(String toAdd)
+    {
+        status.setText(toAdd);
+    }
+
     @Override
     public void actionPerformed(ActionEvent evt)
     {
-        status.setText("");
+        clearStatus();
 
         if (evt.getSource() == save)
         {
             try
             {
-                status.setText("Saving Changes, please wait...");
+                setStatus("Saving Changes, please wait...");
                 writeXML(pokedexfile);
                 getEntry(0);
-                status.setText("Done Saving");
+                setStatus("Done Saving");
             }
             catch (Exception e)
             {
@@ -345,7 +360,7 @@ public class Main extends Frame implements ActionListener, WindowListener
                 {
                     mess += "\n" + o;
                 }
-                status.append(mess);
+                addToStatus(mess);
             }
             return;
         }

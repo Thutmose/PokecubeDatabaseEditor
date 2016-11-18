@@ -10,6 +10,7 @@ import thut.pokecubedatabase.Main;
 public class ButtonHandler implements ActionListener
 {
     SerebiiChecker serebii;
+
     public ButtonHandler(SerebiiChecker checker)
     {
         this.serebii = checker;
@@ -32,16 +33,8 @@ public class ButtonHandler implements ActionListener
             }
             return;
         }
-        else if(evt.getSource() == serebii.mode)
+        else if (evt.getSource() == serebii.mode)
         {
-//            try
-//            {
-//                JsonMoves.merge(new File("./animations.json"), Main.movesFile);
-//            }
-//            catch (Exception e)
-//            {
-//                e.printStackTrace();
-//            }
             if (serebii.mode.getActionCommand().equals("Selected"))
             {
                 serebii.mode.setActionCommand("All");
@@ -51,6 +44,28 @@ public class ButtonHandler implements ActionListener
             {
                 serebii.mode.setActionCommand("Selected");
                 serebii.mode.setLabel("Selected");
+            }
+        }
+        else if (evt.getSource() == serebii.mergeAnims)
+        {
+            try
+            {
+                JsonMoves.merge(new File("./animations.json"), Main.movesFile);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else if (evt.getSource() == serebii.updateMoves)
+        {
+            try
+            {
+                serebii.moves.checkAttack("absorb", 10000, false);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
     }

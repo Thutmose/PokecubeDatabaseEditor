@@ -202,7 +202,7 @@ public class PokedexChecker
             }
         }
         entry.editDatabase();
-        Main.instance.status.setText("Updated " + entry.entry.name);
+        Main.instance.setStatus("Updated " + entry.entry.name);
 
     }
 

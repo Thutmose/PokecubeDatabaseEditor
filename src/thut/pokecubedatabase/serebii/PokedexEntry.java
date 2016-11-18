@@ -71,7 +71,7 @@ public class PokedexEntry
         else
         {
             entry = new XMLPokedexEntry();
-            System.out.println("Creating new Entry for " + name);
+            Main.instance.addToStatus("Creating new Entry for " + name);
             entry.name = name;
             entry.number = number + "";
             entry.base = "true";
@@ -273,6 +273,7 @@ public class PokedexEntry
         String stat;
         stat = " HP";
         int[] evs = new int[6];
+        boolean ev = false;
         if (val.contains(stat))
         {
             int index = val.indexOf(stat);
@@ -280,6 +281,7 @@ public class PokedexEntry
             try
             {
                 evs[0] = Integer.parseInt(var);
+                ev = true;
             }
             catch (NumberFormatException e)
             {
@@ -293,6 +295,7 @@ public class PokedexEntry
             try
             {
                 evs[1] = Integer.parseInt(var);
+                ev = true;
             }
             catch (NumberFormatException e)
             {
@@ -306,6 +309,7 @@ public class PokedexEntry
             try
             {
                 evs[2] = Integer.parseInt(var);
+                ev = true;
             }
             catch (NumberFormatException e)
             {
@@ -319,6 +323,7 @@ public class PokedexEntry
             try
             {
                 evs[3] = Integer.parseInt(var);
+                ev = true;
             }
             catch (NumberFormatException e)
             {
@@ -332,6 +337,7 @@ public class PokedexEntry
             try
             {
                 evs[4] = Integer.parseInt(var);
+                ev = true;
             }
             catch (NumberFormatException e)
             {
@@ -345,6 +351,7 @@ public class PokedexEntry
             try
             {
                 evs[5] = Integer.parseInt(var);
+                ev = true;
             }
             catch (NumberFormatException e)
             {
@@ -356,6 +363,10 @@ public class PokedexEntry
             {
                 entry.stats.evs.values.put(new QName(Main.statsNames[i]), evs[i] + "");
             }
+        }
+        if (!ev)
+        {
+            System.err.println("No EVs for " + entry.name);
         }
     }
 

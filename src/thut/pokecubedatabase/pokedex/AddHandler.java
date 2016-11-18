@@ -35,13 +35,13 @@ public class AddHandler implements ActionListener
             {
                 if (Main.instance.hasEntry(newname, newNum))
                 {
-                    Main.instance.status.setText("ERROR, THAT ENTRY ALREADY EXISTS");
+                    Main.instance.setStatus("ERROR, THAT ENTRY ALREADY EXISTS");
                     return;
                 }
                 else
                 {
                     appendPokemon(newNum, newname);
-                    Main.instance.status.setText("ADDED NEW ENTRY: " + newname);
+                    Main.instance.setStatus("ADDED NEW ENTRY: " + newname);
                 }
             }
             catch (ParserConfigurationException | SAXException | IOException | JAXBException e)

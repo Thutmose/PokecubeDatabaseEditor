@@ -3,7 +3,6 @@ package thut.pokecubedatabase.serebii;
 import java.awt.Button;
 import java.awt.Label;
 import java.awt.Panel;
-import java.io.IOException;
 
 import thut.pokecubedatabase.Main;
 
@@ -14,6 +13,8 @@ public class SerebiiChecker
     public Panel      panel;
     Button            update;
     Button            mode;
+    Button            updateMoves;
+    Button            mergeAnims;
     ButtonHandler     handler;
     PokedexChecker    pokedex    = new PokedexChecker();
     MovesChecker      moves      = new MovesChecker();
@@ -25,8 +26,12 @@ public class SerebiiChecker
         panel.add(new Label("Update Mode:"));
         panel.add(mode = new Button("Selected"));
         panel.add(update = new Button("Update From Serebii"));
+        panel.add(updateMoves = new Button("Update Moves"));
+        panel.add(mergeAnims = new Button("Merge Animations"));
         mode.addActionListener(handler);
         update.addActionListener(handler);
+        updateMoves.addActionListener(handler);
+        mergeAnims.addActionListener(handler);
     }
 
     public void updatePokedexEntryFromSerebii(int num)
@@ -46,11 +51,10 @@ public class SerebiiChecker
     {
         try
         {
-            moves.checkAttack(move, 10000);
+            moves.checkAttack(move, 10000, true);
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

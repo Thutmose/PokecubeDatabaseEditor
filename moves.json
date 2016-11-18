@@ -1,6 +1,31 @@
 {
   "moves": [
     {
+      "name": "10000000voltthunderbolt",
+      "readableName": "10,000,000 Volt Thunderbolt",
+      "type": "Electric",
+      "category": "Special",
+      "pp": "1",
+      "pwr": "195",
+      "acc": "0",
+      "battleEffect": "The user, Pikachu wearing a cap, powers up a jolt of electricity using its Z-Power and unleashes it. Critical hits land more easily.",
+      "secondaryEffect": "No effect.",
+      "effectRate": "-- %",
+      "tmNum": "None",
+      "speedPriority": "0",
+      "target": "Selected Target",
+      "contact": "No",
+      "soundType": "No",
+      "punchType": "No",
+      "snatchable": "No",
+      "zMove": "Yes",
+      "defrosts": "No",
+      "wideArea": "No",
+      "magiccoat": "No",
+      "protect": "No",
+      "mirrormove": "No"
+    },
+    {
       "name": "absorb",
       "readableName": "Absorb",
       "type": "Grass",

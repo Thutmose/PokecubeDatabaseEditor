@@ -79,7 +79,7 @@ public class MovesChecker
     {
     }
 
-    public void checkAttack(String attack, int n) throws IOException
+    public void checkAttack(String attack, int n, boolean fromhere) throws IOException
     { // Make a URL to the web page
         attack = convertMoveName(attack);
         String serebii = "http://www.serebii.net";
@@ -90,8 +90,9 @@ public class MovesChecker
         Elements options = doc.select("SELECT > OPTION");
 
         Map<String, List<String>> erroredSet = new HashMap<>();
-        // System.out.println(options);
-        boolean found = false;
+        List<String> miscErrors = new ArrayList<String>();
+        Main.instance.clearStatus();
+        boolean found = !fromhere;
         for (Element element : options)
         {
             String attr = element.attr("value");
@@ -104,7 +105,7 @@ public class MovesChecker
             if (!found) continue;
             MoveEntry move = new MoveEntry(element.text());
             move.entry.readableName = element.text();
-            System.out.println("  Updating " + element.text());
+            Main.instance.addToStatus("  Updating " + element.text());
             String html2 = serebii + attr;
             Document moveDoc;
             try
@@ -113,7 +114,8 @@ public class MovesChecker
             }
             catch (Exception e1)
             {
-                e1.printStackTrace();
+                miscErrors.add(move.entry.readableName);
+                System.err.println("    Error with " + move.entry.readableName);
                 continue;
             }
             moveDoc.outputSettings().escapeMode(EscapeMode.xhtml);
@@ -166,7 +168,8 @@ public class MovesChecker
             JsonMoves.write(Main.movesFile);
             if (n-- <= 0) break;
         }
-        System.out.println("Problem sets: " + erroredSet);
+        if (!erroredSet.isEmpty()) Main.instance.addToStatus("Problem sets: " + erroredSet);
+        if (!miscErrors.isEmpty()) Main.instance.addToStatus("Problem moves: " + miscErrors);
         System.out.println("done");
     }
 
