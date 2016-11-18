@@ -3,6 +3,8 @@ package thut.pokecubedatabase.serebii;
 import java.io.IOException;
 import java.util.HashSet;
 
+import javax.xml.namespace.QName;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -323,6 +325,26 @@ public class PokedexChecker
         entry.setType(0, type1);
         entry.setType(1, type2);
         values = rows.get(rows.size() - 1).select("td");
+
+        // Height
+        if (entry.entry.stats.sizes.values.isEmpty())
+        {
+            String[] vals = values.get(1).text().split(" ");
+            String size = null;
+            for (String s : vals)
+            {
+                if (s.contains("m"))
+                {
+                    size = s.replace("m", "").trim();
+                }
+            }
+            if (size != null)
+            {
+                entry.entry.stats.sizes.values.put(new QName("height"), size);
+                entry.entry.stats.sizes.values.put(new QName("width"), size);
+                entry.entry.stats.sizes.values.put(new QName("length"), size);
+            }
+        }
 
         // Mass
         String[] vals = values.get(2).text().split(" ");

@@ -211,8 +211,8 @@ public class PokedexEntry
     public void setAbilities(boolean hidden, String abilities)
     {
         String key = hidden ? "hidden" : "normal";
-        if (abilities != null && !abilities.isEmpty()) entry.stats.types.values.put(new QName(key), abilities);
-        else entry.stats.types.values.remove(new QName(key), abilities);
+        if (abilities != null && !abilities.isEmpty()) entry.stats.abilities.values.put(new QName(key), abilities);
+        else entry.stats.abilities.values.remove(new QName(key), abilities);
     }
 
     public void setBaseStat(int index, String stat)
