@@ -7,7 +7,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Entities.EscapeMode;
-import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
 import thut.pokecubedatabase.Main;
@@ -41,406 +40,308 @@ public class PokedexChecker
         else if (numStr.length() == 2) numStr = "0" + numStr;
         // Make a URL to the web page
         String html = "http://www.serebii.net/" + pokedex + "/" + numStr + ".shtml";
-
         Document doc = Jsoup.connect(html).get();
         doc.outputSettings().escapeMode(EscapeMode.xhtml);
-        Elements tableElements = doc.select("table");
-        Elements tableRowElements = tableElements.select(":not(thead) tr");
-
-        char[] genders = getGenderSymbols(tableRowElements);
-
-        String name = "";
-
-        Element row = tableRowElements.get(3);
-        Elements rowItems = row.select("td");
-        int index = 30 - getGen(num);
-
-        for (int j = index; j < rowItems.size(); j++)
+        Elements tables = doc.select("table");
+        PokedexEntry entry = null;
+        for (Element table : tables)
         {
-            Element item = rowItems.get(j - 5);
-            String text = item.text().replace(genders[0], 'M').replace(genders[1], 'F');
-            if (name.isEmpty() && text.contains("Gender Ratio"))
+            String attr2 = table.attr("class");
+            if (attr2.equals("dextable"))
             {
-                name = rowItems.get(j).text().replace(genders[0], 'M').replace(genders[1], 'F');
-            }
-        }
-        if (name == null) return;
+                Elements rows = table.select("tr");
+                String firstLine = rows.get(0).select("td").text();
 
-        PokedexEntry entry = new PokedexEntry(name, num);
-        Main.instance.status.setText("Updating " + name);
-        boolean gender = false;
-        boolean stats = false;
-        boolean lvlup = false;
-        boolean type = false;
-        for (int i = 3; i < tableRowElements.size(); i++)
-        {
-            row = tableRowElements.get(i);
-            rowItems = row.select("td");
-
-            for (int j = 0; j < rowItems.size(); j++)
-            {
-                Element item = rowItems.get(j);
-                String text = item.text().replace(genders[0], 'M').replace(genders[1], 'F');
-
-                if (text.equals("Type") && !type)
+                if (firstLine.contains("Mega Evolution"))
                 {
-                    boolean classification = false;
-                    int k = 1;
-                    while (!classification)
+                    // TODO make new thing for megas here.
+                    break;
+                }
+
+                if (firstLine.contains("Picture Name Other Names"))
+                {
+                    if (entry != null)
                     {
-                        k++;
-                        String input = rowItems.get(j + k).toString();
-                        classification = rowItems.get(j + k).text().equals("Classification");
-                        if (isTypeField(input))
+                        System.out.println("duplicate? " + entry.entry.name);
+                        break;
+                    }
+                    entry = parseInitialRowsAndCreateEntry(rows, num);
+                }
+
+                if (entry == null) System.out.println("null?");
+
+                if (firstLine.contains("Abilities:"))
+                {
+                    parseAbilitiesHappinessEVs(rows, entry);
+                }
+
+                boolean lvlup = firstLine.contains("Level Up");
+                if (lvlup)
+                {
+                    if (firstLine.contains("Alola") && !(entry.entry.name.contains("Alolan"))) lvlup = false;
+                    else if (entry.entry.name.contains("Alolan") && !firstLine.contains("Alola")) lvlup = false;
+                }
+
+                if (lvlup)
+                {
+                    // Level up moves, clear them first.
+                    entry.entry.moves.lvlupMoves.values.clear();
+                    for (int i = 2; i + 1 < rows.size(); i += 2)
+                    {
+                        Elements values = rows.get(i).select("td");
+                        int level = 1;
+                        try
                         {
-                            int n = 0;
-                            for (Node node : rowItems.get(j + k).childNodes())
+                            level = Integer.parseInt(values.get(0).text());
+                        }
+                        catch (NumberFormatException e)
+                        {
+                        }
+                        String move = values.get(1).text();
+                        entry.addLvlMove(level, move);
+                    }
+                }
+                if (firstLine.contains("TM & HM Attacks"))
+                {
+                    // TM moves
+                    // TODO make this also check which forme before adding.
+                    Elements headers = rows.get(1).select("th");
+                    int index = 2;
+                    if (headers.last().text().equals("Form")) index = 3;
+                    for (int i = 2; i + index - 1 < rows.size(); i += index)
+                    {
+                        Elements values = rows.get(i).select("td");
+                        String move = values.get(1).text();
+                        boolean valid = true;
+                        if (index == 3)
+                        {
+                            valid = false;
+                            Elements formes = values.get(8).select("img");
+                            boolean normal = !entry.entry.name.contains("Alolan");
+                            for (Element e : formes)
                             {
-                                if (node.childNodeSize() > 0)
+                                if (e.text().contains("Alola") && !normal)
                                 {
-                                    String typeName = node.childNode(0).attr("src").replace(".gif", "")
-                                            .replace("/" + typeLoc + "/type/", "");
-                                    try
-                                    {
-                                        typeName = Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
-                                        entry.setType(n++, typeName);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        // System.err.println(entry.name + " " +
-                                        // node.childNode(0).attr("src") + " "
-                                        // + node.childNode(0));
-                                        System.err.println("Error with types for " + name);
-                                    }
+                                    valid = true;
+                                    break;
+                                }
+                                if (!e.text().contains("Alola") && normal)
+                                {
+                                    valid = true;
+                                    break;
                                 }
                             }
                         }
+                        if (valid) entry.addOtherMove(move);
                     }
-
-                    type = true;
                 }
-
-                if (!gender && isGenderString(text))
+                if (firstLine.contains("Egg Moves") || firstLine.contains("Move Tutor")
+                        || firstLine.contains("Special Moves"))
                 {
-                    entry.parseGenderAndInfo(text);
-                    gender = true;
-                }
-                if (gender && !stats && isBaseStats(text))
-                {
-                    stats = true;
-                    for (int k = 1; k <= 6; k++)
+                    // Egg moves
+                    // TODO make this also check which forme before adding.
+                    Elements headers = rows.get(1).select("th");
+                    int index = 2;
+                    if (headers.last().text().equals("Form")) index = 3;
+                    for (int i = index; i + 1 < rows.size(); i += 2)
                     {
-                        Element stat = rowItems.get(k + j);
-                        entry.setBaseStat(k - 1, stat.text().trim());
+                        Elements values = rows.get(i).select("td");
+                        String move = values.get(0).text();
+                        boolean valid = false;
+                        Elements formes = values.select("img");
+                        int n = 0;
+                        boolean normal = !entry.entry.name.contains("Alolan");
+                        for (Element e : formes)
+                        {
+                            if (!e.attr("src").contains("icon")) continue;
+                            n++;
+                            String name = e.attr("title");
+                            if (name.contains("Alola") && !normal)
+                            {
+                                valid = true;
+                                break;
+                            }
+                            if (!name.contains("Alola") && normal)
+                            {
+                                valid = true;
+                                break;
+                            }
+                        }
+                        if (n == 0) valid = true;
+                        if (valid) entry.addOtherMove(move);
                     }
                 }
-                if (gender && !lvlup && text.length() < 40 && text.contains("Level Up") && !text.contains("X & Y")
-                        && !text.contains("Anchors"))
+                if (firstLine.contains("Usable Z Moves"))
                 {
-                    lvlup = true;
-                    int indexIn = j + 1;
-                    entry.entry.moves.lvlupMoves.values.clear();
-                    indexIn = parseLevelMoves(indexIn, rowItems, entry);
-                    Element move = rowItems.get(indexIn);
-                    parseMoves(move.text(), indexIn, rowItems, entry);
+                    // Z Moves
+                }
+                if (firstLine.contains("Transfer Only Moves"))
+                {
+                    // th is more than 0 means there is another header there, so
+                    // we need to increment down 1
+                    int startIndex = rows.get(2).select("th").size() == 0 ? 2 : 3;
+                    // Other move tutor or tm moves.
+                    for (int i = startIndex; i + 1 < rows.size(); i += 2)
+                    {
+                        Elements values = rows.get(i).select("td");
+                        String move = values.get(0).text();
+                        entry.addOtherMove(move);
+                    }
+                }
+                if (firstLine.equals("Stats"))
+                {
+                    // Stats
+                    Elements values = rows.get(2).select("td");
+                    for (int i = 1; i < 7; i++)
+                    {
+                        entry.setBaseStat(i - 1, values.get(i).text());
+                    }
                 }
             }
         }
         entry.editDatabase();
-        Main.instance.status.setText("Updated " + name);
+        Main.instance.status.setText("Updated " + entry.entry.name);
+
     }
 
-    private boolean isTypeField(String input)
+    /** Parse through and fill in the abilities, exp mode, happiness, evs, and
+     * maybe the boolean of has mega evolution later.
+     * 
+     * @param rows
+     * @param entry */
+    public static void parseAbilitiesHappinessEVs(Elements rows, PokedexEntry entry)
     {
-        return input.contains("/type/");
+        // Abilities, exp mode, base happiness, evs, does it
+        // mega evolve.
+        Elements values = rows.get(1).select("b");
+        boolean foundHidden = false;
+        String normal = "";
+        String hidden = null;
+        for (int i = 0; i < values.size(); i++)
+        {
+            foundHidden = values.get(i).text().equals("Hidden Ability");
+            if (!foundHidden)
+            {
+                if (normal.isEmpty()) normal = values.get(i).text();
+                else normal = normal + ", " + values.get(i).text();
+            }
+            else
+            {
+                hidden = values.get(i + 1).text();
+                break;
+            }
+        }
+        entry.setAbilities(false, normal);
+        entry.setAbilities(true, hidden);
+
+        values = rows.get(3).select("td");
+
+        // Exp mode
+        String text = values.get(0).text();
+        int index = text.indexOf("Points") + 7;
+        entry.entry.stats.expMode = text.substring(index, text.length()).trim();
+
+        // Base Happiness
+        entry.entry.stats.baseFriendship = values.get(1).text().trim();
+
+        // EVs
+        // This means it doesn't have other formes listed.
+        if (values.get(2).select("b").size() == 0)
+        {
+            entry.parseEVs(values.get(2).text());
+        }
+        else
+        {
+            // TODO make this allow selecting which forme to pick
+            // from the set.
+            String forme1 = values.get(2).select("b").get(1).text();
+            String forme = values.get(2).select("b").get(0).text();
+            String val = values.get(2).text().replace(forme, "").trim();
+            entry.parseEVs(val.substring(0, val.indexOf(forme1)));
+        }
     }
 
-    private void parseMoves(String header, int indexIn, Elements rowItems, PokedexEntry entry)
+    /** This is the result of parsing the first row of the table, the one
+     * titled: Picture Name Other Names
+     * 
+     * @param rows
+     * @param num
+     * @return */
+    private static PokedexEntry parseInitialRowsAndCreateEntry(Elements rows, int num)
     {
-        int newIndex = indexIn;
-        if (header.contains("TM & HM Attacks"))
+        PokedexEntry entry = null;
+        // Name, gender, types, capture rate, mass, egg time,
+        // size
+        Elements values = rows.get(1).select("td");
+        String name = values.get(3).text();
+
+        // This is used to replace symbols with M and F in names
+        // of nidorans.
+        char[] genders = new char[2];
+        String male = "";
+        String female = "";
+
+        // Find genders, this is needed before name for the
+        // symbol.
+        for (int i = 0; i < values.size(); i++)
         {
-            try
+            Element e = values.get(i);
+            if (e.text().contains("Male") && !e.text().contains("Female"))
             {
-                newIndex = parseTMMoves(indexIn, rowItems, entry);
+                male = values.get(i + 1).text().replace("%", "");
+                genders[0] = e.text().charAt(5);
             }
-            catch (Exception e)
+            if (e.text().contains("Female") && !e.text().contains("Male"))
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                genders[1] = e.text().charAt(7);
+                female = values.get(i + 1).text().replace("%", "");
             }
         }
-        else if (header.contains("Pre-Evolution Only Moves"))
+        name = name.replace(genders[0], 'M');
+        name = name.replace(genders[1], 'F');
+        entry = new PokedexEntry(name, num);
+        System.out.println("Starting " + name);
+
+        // Set genders
+        if (!male.isEmpty())
         {
-            try
+            float f = Float.parseFloat(female);
+            entry.entry.stats.genderRatio = (int) (f * 254 / 100) + "";
+        }
+
+        // Set Types
+        int index = values.size() - 1;//
+        String test = values.get(index - 1).text();
+        if (!test.contains("%") && !test.contains("Genderless"))
+        {
+            index -= 2;
+        }
+        Element e = values.get(index);
+        Elements types = e.select("a");
+        String type1 = types.get(0).attr("href");
+        String type2 = types.size() < 2 ? null : types.get(1).attr("href");
+        entry.setType(0, type1);
+        entry.setType(1, type2);
+        values = rows.get(rows.size() - 1).select("td");
+
+        // Mass
+        String[] vals = values.get(2).text().split(" ");
+        String mass = null;
+        for (String s : vals)
+        {
+            if (s.contains("kg"))
             {
-                newIndex = parsePreEvoMoves(indexIn, rowItems, entry);
-            }
-            catch (Exception e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                mass = s.replace("kg", "").trim();
             }
         }
-        else if (header.contains("Egg Moves"))
+        if (mass != null)
         {
-            try
-            {
-                newIndex = parseEggMoves(indexIn, rowItems, entry);
-            }
-            catch (Exception e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            entry.entry.stats.mass = mass;
         }
-        else if (header.contains("Move Tutor"))
-        {
-            try
-            {
-                newIndex = parseMoveTutor(indexIn, rowItems, entry);
-            }
-            catch (Exception e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        else if (header.contains("Transfer Only"))
-        {
-            try
-            {
-                newIndex = parseTransferMoves(indexIn, rowItems, entry);
-            }
-            catch (Exception e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        else if (header.contains("Special Moves"))
-        {
-            try
-            {
-                newIndex = parseSpecialMoves(indexIn, rowItems, entry);
-            }
-            catch (Exception e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-        if (indexIn != newIndex)
-        {
-            header = rowItems.get(newIndex).text();
-            parseMoves(header, newIndex, rowItems, entry);
-        }
+
+        // Capture rate.
+        String captureRate = values.get(3).text();
+        entry.entry.stats.captureRate = captureRate;
+        return entry;
     }
-
-    private int parseTMMoves(int indexIn, Elements rowItems, PokedexEntry entry)
-    {
-        Element move;
-        boolean tms = false;
-        int index = indexIn + 2;
-        while (true)
-        {
-            move = rowItems.get(index);
-            String attack = move.text();
-            String info = rowItems.get(index - 1).text();
-            if (!(info.contains("TM") || info.contains("HM"))) break;
-            entry.addOtherMove(attack);
-            index += 9;
-            tms = true;
-        }
-        move = rowItems.get(index - 1);
-        index = index - 1;
-        if (tms) indexIn = index;
-        return indexIn;
-    }
-
-    private int parseEggMoves(int indexIn, Elements rowItems, PokedexEntry entry)
-    {
-        Element move;
-        boolean valid = false;
-        int index = indexIn + 1;
-        while (true)
-        {
-            move = rowItems.get(index);
-            if (isMoveSection(rowItems.get(index + 1).text())) break;
-            if (isMoveSection(rowItems.get(index).text())) break;
-            valid = true;
-            String attack = move.text();
-            entry.addOtherMove(attack);
-            index += 9;
-        }
-        if (valid) indexIn = index;
-        return indexIn;
-    }
-
-    private int parseSpecialMoves(int indexIn, Elements rowItems, PokedexEntry entry)
-    {
-        Element move;
-        boolean valid = false;
-        int index = indexIn + 1;
-        while (true)
-        {
-            move = rowItems.get(index);
-            if (isMoveSection(rowItems.get(index + 1).text()) || isMoveSection(move.text())) break;
-            valid = true;
-            String attack = move.text();
-            entry.addOtherMove(attack);
-            index += 9;
-        }
-        if (valid) indexIn = index;
-        return indexIn;
-    }
-
-    private int parseMoveTutor(int indexIn, Elements rowItems, PokedexEntry entry)
-    {
-        Element move;
-        boolean valid = false;
-        int index = indexIn + 1;
-        while (true)
-        {
-            if (rowItems.size() >= index) break;
-            move = rowItems.get(index);
-            if (isMoveSection(rowItems.get(index + 1).text()) || isMoveSection(rowItems.get(index).text())) break;
-            valid = true;
-            String attack = move.text();
-            entry.addOtherMove(attack);
-            index += 8;
-        }
-        if (valid) indexIn = index;
-        return indexIn;
-    }
-
-    private int parseTransferMoves(int indexIn, Elements rowItems, PokedexEntry entry)
-    {
-        Element move;
-        boolean valid = false;
-        int index = indexIn + 1;
-        boolean cont = true;
-        while (cont)
-        {
-            move = rowItems.get(index);
-            String attack = move.text();
-            if (isMoveSection(attack)) break;
-            cont = !isMoveSection(rowItems.get(index + 10).text());
-            entry.addOtherMove(attack);
-            valid = true;
-            index += 9;
-        }
-        if (valid) indexIn = index;
-        return indexIn;
-    }
-
-    private int parsePreEvoMoves(int indexIn, Elements rowItems, PokedexEntry entry)
-    {
-        Element move;
-        boolean valid = false;
-        int index = indexIn + 1;
-        boolean cont = true;
-        while (cont)
-        {
-            move = rowItems.get(index);
-            String attack = move.text();
-            if (isMoveSection(attack)) break;
-            cont = !isMoveSection(rowItems.get(index + 12).text());
-            entry.addOtherMove(attack);
-            valid = true;
-            index += 11;
-        }
-        if (valid) indexIn = index;
-        return indexIn;
-    }
-
-    private int parseLevelMoves(int indexIn, Elements rowItems, PokedexEntry entry)
-    {
-        Element move;
-        move = rowItems.get(indexIn);
-        while (true)
-        {
-            move = rowItems.get(indexIn);
-            String level = move.text();
-            if (level.length() > 3) break;
-
-            int l = 1;
-            try
-            {
-                l = Integer.parseInt(level);
-            }
-            catch (NumberFormatException e)
-            {
-            }
-            entry.addLvlMove(l, rowItems.get(indexIn + 1).text());
-            indexIn += 9;
-        }
-        return indexIn;
-    }
-
-    public static boolean isMoveSection(String input)
-    {
-        for (String s : movesets)
-        {
-            if (input.contains(s)) return true;
-        }
-        return false;
-    }
-
-    public static int getGen(int pokedexNb)
-    {
-        if (pokedexNb < 152) return 1;
-        if (pokedexNb < 252) return 2;
-        if (pokedexNb < 387) return 3;
-        if (pokedexNb < 494) return 4;
-        if (pokedexNb < 650) return 5;
-        if (pokedexNb < 722) return 6;
-        return 0;
-    }
-
-    boolean isGenderString(String text)
-    {
-        if (text.contains("Male") && text.contains("Female") && text.contains("%")
-                || text.contains("is Genderless")) { return true; }
-        return false;
-    }
-
-    boolean isBaseStats(String text)
-    {
-        if (text.length() == 23 && text.trim().contains("Base Stats - Total:")) return true;
-        return false;
-    }
-
-    // Find the special gender symbols.
-    char[] getGenderSymbols(Elements tableRowElements)
-    {
-        char[] ret = new char[2];
-        boolean foundPicture = false;
-        for (int i = 0; i < tableRowElements.size(); i++)
-        {
-            Element row = tableRowElements.get(i);
-            Elements rowItems = row.select("td");
-            for (int j = 0; j < rowItems.size(); j++)
-            {
-                Element item = rowItems.get(j);
-
-                String text = item.text();
-                if (!foundPicture) foundPicture = text.equals("Picture");
-                if (!foundPicture) continue;
-
-                if (text.contains("Male") && text.contains("Female") && text.contains("%"))
-                {
-                    int index = text.indexOf("Male ") + "Male ".length();
-                    ret[0] = text.charAt(index);
-                    index = text.indexOf("Female ") + "Female ".length();
-                    ret[1] = text.charAt(index);
-                    return ret;
-                }
-                // if (!text.trim().isEmpty()) System.out.println(text);
-            }
-            // System.out.println();
-        }
-        return ret;
-    }
-
 }

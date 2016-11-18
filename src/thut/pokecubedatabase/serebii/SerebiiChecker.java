@@ -31,19 +31,15 @@ public class SerebiiChecker
 
     public void updatePokedexEntryFromSerebii(int num)
     {
-        System.out.println("start");
-        String first = "10,000,000 Volt Thunderbolt";
-        first = "absorb";
-        updateMoveEntryFromSerebii(first);
-        // try
-        // {
-        // pokedex.parseForNumber(num);
-        // }
-        // catch (Exception e)
-        // {
-        // System.out.println(num + " Failed");
-        // e.printStackTrace();
-        // }
+        try
+        {
+            pokedex.parseForNumber(num);
+        }
+        catch (Exception e)
+        {
+            System.out.println(num + " Failed");
+            e.printStackTrace();
+        }
     }
 
     public void updateMoveEntryFromSerebii(String move)

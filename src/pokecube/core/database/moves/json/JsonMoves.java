@@ -21,6 +21,17 @@ public class JsonMoves
     private static MovesJson                  moves;
     private static Map<String, MoveJsonEntry> movesMap   = new HashMap<>();
 
+    public static class AnimationsJson
+    {
+        public String name;
+        public String defaultanimation;
+    }
+
+    public static class AnimsJson
+    {
+        public List<AnimationsJson> moves = new ArrayList<>();
+    }
+
     public static class MoveJsonEntry
     {
         public String name;
@@ -60,11 +71,13 @@ public class JsonMoves
         public String mirrormove;
 
         public String zVersion;
+
+        public String defaultanimation;
     }
 
     public static class MovesJson
     {
-        List<MoveJsonEntry> moves = new ArrayList<>();
+        public List<MoveJsonEntry> moves = new ArrayList<>();
 
         public MoveJsonEntry getEntry(String name, boolean create)
         {
@@ -161,6 +174,55 @@ public class JsonMoves
             {
                 e1.printStackTrace();
             }
+        }
+    }
+
+    public static void merge(File animationFile, File movesFile)
+    {
+        loadMoves(movesFile);
+        try
+        {
+            FileReader reader = new FileReader(animationFile);
+            AnimsJson animations = gson.fromJson(reader, AnimsJson.class);
+            reader.close();
+            List<AnimationsJson> movesList = new ArrayList<>(animations.moves);
+            for (AnimationsJson anim : movesList)
+            {
+                if (anim.defaultanimation == null) animations.moves.remove(anim);
+            }
+
+            animations.moves.sort(new Comparator<AnimationsJson>()
+            {
+                @Override
+                public int compare(AnimationsJson arg0, AnimationsJson arg1)
+                {
+                    return arg0.name.compareTo(arg1.name);
+                }
+            });
+
+            for (MoveJsonEntry entry : moves.moves)
+            {
+                for (AnimationsJson anims : animations.moves)
+                {
+                    if (convertMoveName(anims.name).equals(convertMoveName(entry.name)))
+                    {
+                        entry.defaultanimation = anims.defaultanimation;
+                        anims.name = entry.name;
+                        if (entry.defaultanimation != null)
+                            System.out.println("merged " + entry.defaultanimation + " for " + entry.readableName);
+                        break;
+                    }
+                }
+            }
+            write(movesFile);
+             String output = prettyGson.toJson(animations);
+             FileWriter writer = new FileWriter(animationFile);
+             writer.append(output);
+             writer.close();
+        }
+        catch (Exception e)
+        {
+
         }
     }
 

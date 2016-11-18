@@ -20,7 +20,7 @@ import thut.pokecubedatabase.Main;
 
 public class MovesChecker
 {
-    public static String                       movedex   = "attackdex-sm";                                           // pokedex-xy
+    public static String                       movedex   = "attackdex-sm";
     public static IValueFixer                  typeFixer = new IValueFixer()
                                                          {
                                                              @Override
@@ -118,7 +118,6 @@ public class MovesChecker
             }
             moveDoc.outputSettings().escapeMode(EscapeMode.xhtml);
             Elements tables = moveDoc.select("table");
-            int counted = 0;
             for (Element table : tables)
             {
                 String attr2 = table.attr("class");
@@ -162,9 +161,7 @@ public class MovesChecker
                             }
                         }
                     }
-                    counted++;
                 }
-                if (counted > 1) break;
             }
             JsonMoves.write(Main.movesFile);
             if (n-- <= 0) break;

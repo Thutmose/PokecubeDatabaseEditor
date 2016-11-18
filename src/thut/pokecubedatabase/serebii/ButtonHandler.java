@@ -2,7 +2,9 @@ package thut.pokecubedatabase.serebii;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
+import pokecube.core.database.moves.json.JsonMoves;
 import thut.pokecubedatabase.Main;
 
 public class ButtonHandler implements ActionListener
@@ -32,6 +34,14 @@ public class ButtonHandler implements ActionListener
         }
         else if(evt.getSource() == serebii.mode)
         {
+//            try
+//            {
+//                JsonMoves.merge(new File("./animations.json"), Main.movesFile);
+//            }
+//            catch (Exception e)
+//            {
+//                e.printStackTrace();
+//            }
             if (serebii.mode.getActionCommand().equals("Selected"))
             {
                 serebii.mode.setActionCommand("All");

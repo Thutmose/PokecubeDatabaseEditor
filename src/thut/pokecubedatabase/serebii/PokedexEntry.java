@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 
 import pokecube.core.database.moves.json.JsonMoves;
+import pokecube.core.database.moves.json.JsonMoves.IValueFixer;
 import thut.pokecubedatabase.Main;
 import thut.pokecubedatabase.pokedex.XMLEntries;
 import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
@@ -22,6 +23,19 @@ public class PokedexEntry
 {
     HashMap<String, PokedexEntry> formes;
     XMLPokedexEntry               entry;
+    public static IValueFixer     typeFixer = new IValueFixer()
+                                            {
+                                                @Override
+                                                public String fix(String input)
+                                                {
+                                                    String typeName = input
+                                                            .replace("/" + PokedexChecker.pokedex + "/", "")
+                                                            .replace(".shtml", "");
+                                                    typeName = Character.toUpperCase(typeName.charAt(0))
+                                                            + typeName.substring(1);
+                                                    return typeName;
+                                                }
+                                            };
 
     public PokedexEntry(XMLPokedexEntry entry)
     {
@@ -190,7 +204,15 @@ public class PokedexEntry
     public void setType(int index, String type)
     {
         String key = index == 0 ? "type1" : "type2";
-        entry.stats.types.values.put(new QName(key), type);
+        if (type != null && !type.isEmpty()) entry.stats.types.values.put(new QName(key), typeFixer.fix(type));
+        else entry.stats.types.values.remove(new QName(key), type);
+    }
+
+    public void setAbilities(boolean hidden, String abilities)
+    {
+        String key = hidden ? "hidden" : "normal";
+        if (abilities != null && !abilities.isEmpty()) entry.stats.types.values.put(new QName(key), abilities);
+        else entry.stats.types.values.remove(new QName(key), abilities);
     }
 
     public void setBaseStat(int index, String stat)
@@ -206,7 +228,11 @@ public class PokedexEntry
 
     public void addLvlMove(int lvl, String move)
     {
-        entry.moves.lvlupMoves.values.put(new QName("lvl_" + lvl), JsonMoves.convertMoveName(move));
+        QName key = new QName("lvl_" + lvl);
+        String old = entry.moves.lvlupMoves.values.get(key);
+        if (old != null && old.contains(JsonMoves.convertMoveName(move))) return;
+        else if (old == null) entry.moves.lvlupMoves.values.put(key, JsonMoves.convertMoveName(move));
+        else entry.moves.lvlupMoves.values.put(key, old + "," + JsonMoves.convertMoveName(move));
     }
 
     public void addOtherMove(String move)
@@ -218,7 +244,6 @@ public class PokedexEntry
         else
         {
             String[] moves = entry.moves.misc.moves.split(", ");
-
             Set<String> moveset = new HashSet<>();
             for (String s : moves)
                 moveset.add(JsonMoves.convertMoveName(s));
@@ -232,15 +257,20 @@ public class PokedexEntry
         }
     }
 
-    private void parseEVs(Matcher matcher, String info)
+    public void parseEVs(Matcher matcher, String info)
     {
         String val = matcher.group().replace("Points ", "");
         String val2 = val.substring(0, val.lastIndexOf(" "));
         entry.stats.expMode = val2.substring(0, val2.lastIndexOf(" "));
         entry.stats.baseFriendship = Integer.parseInt(val2.replace(entry.stats.expMode, "").trim()) + "";
         val = info.substring(info.indexOf(val) + val.length() - 1, info.lastIndexOf("(s)")).replace("(s)", "");
-        String stat;
 
+    }
+
+    public void parseEVs(String val)
+    {
+        val = val.replace(" Point(s)", "");
+        String stat;
         stat = " HP";
         int[] evs = new int[6];
         if (val.contains(stat))
