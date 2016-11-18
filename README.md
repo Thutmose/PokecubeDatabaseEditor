@@ -6,3 +6,5 @@ This can be used to view and edit the database used by pokecube.
 To use, place this jar in the same directory as the XML files, and then run it.
 
 Includes https://github.com/jhy/jsoup/ for use with collecting information from Serebii.net
+
+Includes https://github.com/google/gson for use with exporting/importing moves.json and animations.json
