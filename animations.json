@@ -1,0 +1,528 @@
+{
+  "moves": [
+    {
+      "name": "absorb",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "acid",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "acidspray",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "aeroblast",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "airslash",
+      "defaultanimation": "pont:vsweepAttack"
+    },
+    {
+      "name": "ancientpower",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "attackorder",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "aurasphere",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "aurorabeam",
+      "defaultanimation": "beam:aurora:0.5"
+    },
+    {
+      "name": "belch",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "bide",
+      "defaultanimation": "pons"
+    },
+    {
+      "name": "blizzard",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "boneclub",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "bonemerang",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "brine",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "bubble",
+      "defaultanimation": "flow:bubble"
+    },
+    {
+      "name": "bubblebeam",
+      "defaultanimation": "beam:bubble:0.5"
+    },
+    {
+      "name": "bugbuzz",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "bulletseed",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "chargebeam",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "confuseray",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "cut",
+      "defaultanimation": "pont:vsweepAttack"
+    },
+    {
+      "name": "darkpulse",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "dazzlinggleam",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "discharge",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "dracometeor",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "dragonbreath",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "dragonpulse",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "earthpower",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "eggbomb",
+      "defaultanimation": "throw:w0.2"
+    },
+    {
+      "name": "electroball",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "ember",
+      "defaultanimation": "flow:vflame:d0.05"
+    },
+    {
+      "name": "energyball",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "firepunch",
+      "defaultanimation": "pont:vflame"
+    },
+    {
+      "name": "firespin",
+      "defaultanimation": "pont:vflame"
+    },
+    {
+      "name": "flameburst",
+      "defaultanimation": "pont:vflame"
+    },
+    {
+      "name": "flamethrower",
+      "defaultanimation": "beam:flame:0.2"
+    },
+    {
+      "name": "flamewheel",
+      "defaultanimation": "pons:vflame"
+    },
+    {
+      "name": "flashcannon",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "fling",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "focusblast",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "focusenergy",
+      "defaultanimation": "pons"
+    },
+    {
+      "name": "freezedry",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "fusionflare",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "gigadrain",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "guillotine",
+      "defaultanimation": "pont:vsweepAttack"
+    },
+    {
+      "name": "gunkshot",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "gust",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "haze",
+      "defaultanimation": "powder:pcloud:d0.2"
+    },
+    {
+      "name": "hiddenpower",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "hydropump",
+      "defaultanimation": "beam:splash:0.2"
+    },
+    {
+      "name": "hyperbeam",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "icebeam",
+      "defaultanimation": "beam:misc:0.2"
+    },
+    {
+      "name": "iceburn",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "icepunch",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "iceshard",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "iciclecrash",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "icywind",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "irontail",
+      "defaultanimation": "pont:vsweepAttack"
+    },
+    {
+      "name": "lavaplume",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "leafstorm",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "leechlife",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "leechseed",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "lightofruin",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "magmastorm",
+      "defaultanimation": "vlow"
+    },
+    {
+      "name": "magnetbomb",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "megadrain",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "metalburst",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "mirrorshot",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "mudbomb",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "nightshade",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "nightslash",
+      "defaultanimation": "pont:vsweepAttack"
+    },
+    {
+      "name": "oblivionwing",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "ominouswind",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "paraboliccharge",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "petaldance",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "pinmissile",
+      "defaultanimation": "throw:w0.1"
+    },
+    {
+      "name": "poisongas",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "poisonpowder",
+      "defaultanimation": "powder:pportal"
+    },
+    {
+      "name": "poisonsting",
+      "defaultanimation": "throw:w0.1"
+    },
+    {
+      "name": "powdersnow",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "powergem",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "psybeam",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "psychocut",
+      "defaultanimation": "pont:vsweepAttack"
+    },
+    {
+      "name": "psyshock",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "psywave",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "razorleaf",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "razorwind",
+      "defaultanimation": "flow:vsweepAttack"
+    },
+    {
+      "name": "roaroftime",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "rockblast",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "rockslide",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "rockthrow",
+      "defaultanimation": "throw:w0.2"
+    },
+    {
+      "name": "rocktomb",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "rockwrecker",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "sacredfire",
+      "defaultanimation": "flow:vflame:d10"
+    },
+    {
+      "name": "sandtomb",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "scald",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "secretpower",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "seedflare",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "shadowball",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "simplebeam",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "slash",
+      "defaultanimation": "pont:vsweepAttack"
+    },
+    {
+      "name": "sleeppowder",
+      "defaultanimation": "powder"
+    },
+    {
+      "name": "sludge",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "sludgebomb",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "sludgewave",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "smog",
+      "defaultanimation": "powder:psmoke"
+    },
+    {
+      "name": "smokescreen",
+      "defaultanimation": "powder:plargesmoke"
+    },
+    {
+      "name": "solarbeam",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "sonicboom",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "spacialrend",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "spark",
+      "defaultanimation": "pons"
+    },
+    {
+      "name": "spikecannon",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "spore",
+      "defaultanimation": "powder"
+    },
+    {
+      "name": "stoneedge",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "stunspore",
+      "defaultanimation": "powder"
+    },
+    {
+      "name": "supersonic",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "swordsdance",
+      "defaultanimation": "pons"
+    },
+    {
+      "name": "thrash",
+      "defaultanimation": "pons"
+    },
+    {
+      "name": "thunder",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "thunderbolt",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "thunderpunch",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "thundershock",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "thunderwave",
+      "defaultanimation": "beam"
+    },
+    {
+      "name": "toxic",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "twineedle",
+      "defaultanimation": "throw:w0.1"
+    },
+    {
+      "name": "vacuumwave",
+      "defaultanimation": "flow"
+    },
+    {
+      "name": "venoshock",
+      "defaultanimation": "pont"
+    },
+    {
+      "name": "watergun",
+      "defaultanimation": "beam:splash"
+    },
+    {
+      "name": "watershuriken",
+      "defaultanimation": "throw"
+    },
+    {
+      "name": "zapcannon",
+      "defaultanimation": "throw"
+    }
+  ]
+}
