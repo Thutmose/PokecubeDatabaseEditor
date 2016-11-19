@@ -177,7 +177,7 @@ public class PokedexChecker
                 {
                     // Z Moves
                 }
-                if (firstLine.contains("Transfer Only Moves"))
+                if (firstLine.contains("Transfer Only Moves") || firstLine.contains("Pre-Evolution Only Moves"))
                 {
                     // th is more than 0 means there is another header there, so
                     // we need to increment down 1
@@ -302,7 +302,8 @@ public class PokedexChecker
         name = name.replace(genders[0], 'M');
         name = name.replace(genders[1], 'F');
         entry = new PokedexEntry(name, num);
-        System.out.println("Starting " + name);
+        //TODO output this to many, many lang files at once.
+        System.out.println("pkmn." + name + ".name=" + name);
 
         // Set genders
         if (!male.isEmpty())

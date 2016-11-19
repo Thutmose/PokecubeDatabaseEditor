@@ -439,7 +439,13 @@ public class XMLEntries
                 Map<QName, String> updated = new HashMap<QName, String>();
                 for (QName key : keys)
                 {
-                    updated.put(key, JsonMoves.convertMoveName(entry.moves.lvlupMoves.values.get(key)));
+                    String[] vals = entry.moves.lvlupMoves.values.get(key).split(",");
+                    String val = JsonMoves.convertMoveName(vals[0]);
+                    for (int i = 1; i < vals.length; i++)
+                    {
+                        val = val + "," + JsonMoves.convertMoveName(vals[i]);
+                    }
+                    updated.put(key, val);
                 }
                 for (QName key : keys)
                 {
