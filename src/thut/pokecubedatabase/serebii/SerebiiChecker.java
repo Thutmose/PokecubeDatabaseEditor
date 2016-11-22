@@ -8,7 +8,7 @@ import thut.pokecubedatabase.Main;
 
 public class SerebiiChecker
 {
-    public static int TOTALCOUNT = 801;
+    public static int TOTALCOUNT = 802;
 
     public Panel      panel;
     Button            update;

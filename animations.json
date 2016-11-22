@@ -2,527 +2,1355 @@
   "moves": [
     {
       "name": "absorb",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "acid",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "acidspray",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "aeroblast",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "airslash",
-      "defaultanimation": "pont:vsweepAttack"
+      "animations": [
+        {
+          "preset": "pont:psweepAttack",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "ancientpower",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "attackorder",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "aurasphere",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "aurorabeam",
-      "defaultanimation": "beam:aurora:0.5"
+      "animations": [
+        {
+          "preset": "beam:paurora:d0.5",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "belch",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "bide",
-      "defaultanimation": "pons"
+      "animations": [
+        {
+          "preset": "pons",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "blizzard",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "boneclub",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "bonemerang",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "brine",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "bubble",
-      "defaultanimation": "flow:bubble"
+      "animations": [
+        {
+          "preset": "flow:bubble",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "bubblebeam",
-      "defaultanimation": "beam:bubble:0.5"
+      "animations": [
+        {
+          "preset": "beam:pbubble:d0.5",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "bugbuzz",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "bulletseed",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "chargebeam",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "confuseray",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "cut",
-      "defaultanimation": "pont:vsweepAttack"
+      "animations": [
+        {
+          "preset": "pont:psweepAttack",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "darkpulse",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "dazzlinggleam",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "discharge",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "dracometeor",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "dragonbreath",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "dragonpulse",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "earthpower",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "eggbomb",
-      "defaultanimation": "throw:w0.2"
+      "animations": [
+        {
+          "preset": "throw:w0.2",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "electroball",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "ember",
-      "defaultanimation": "flow:vflame:d0.05"
+      "animations": [
+        {
+          "preset": "flow:pflame:d0.05",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "energyball",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
+    },
+    {
+      "name": "fireblast",
+      "animations": [
+        {
+          "preset": "flow:pflame:f0:w2:l1",
+          "duration": "5",
+          "starttick": "0"
+        },
+        {
+          "preset": "flow:pflame:f60:w2:l1",
+          "duration": "5",
+          "starttick": "0"
+        },
+        {
+          "preset": "flow:pflame:f120:w2:l1",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "firepunch",
-      "defaultanimation": "pont:vflame"
+      "animations": [
+        {
+          "preset": "pont:pflame",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "firespin",
-      "defaultanimation": "pont:vflame"
+      "animations": [
+        {
+          "preset": "pont:pflame",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "flameburst",
-      "defaultanimation": "pont:vflame"
+      "animations": [
+        {
+          "preset": "pont:pflame",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "flamethrower",
-      "defaultanimation": "beam:flame:0.2"
+      "animations": [
+        {
+          "preset": "beam:pflame:d0.2",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "flamewheel",
-      "defaultanimation": "pons:vflame"
+      "animations": [
+        {
+          "preset": "pons:pflame",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "flashcannon",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "fling",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "focusblast",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "focusenergy",
-      "defaultanimation": "pons"
+      "animations": [
+        {
+          "preset": "pons",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "freezedry",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "fusionflare",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "gigadrain",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "guillotine",
-      "defaultanimation": "pont:vsweepAttack"
+      "animations": [
+        {
+          "preset": "pont:psweepAttack",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "gunkshot",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "gust",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "haze",
-      "defaultanimation": "powder:pcloud:d0.2"
+      "animations": [
+        {
+          "preset": "powder:pcloud:d0.2",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "hiddenpower",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "hydropump",
-      "defaultanimation": "beam:splash:0.2"
+      "animations": [
+        {
+          "preset": "beam:psplash:d0.2",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "hyperbeam",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam:corange",
+          "duration": "5",
+          "starttick": "0",
+          "applyAfter": "true"
+        },
+        {
+          "preset": "cylFunc:pmisc:cwhite:f(z^2-z)*2,z*6.3",
+          "duration": "5",
+          "starttick": "0"
+        },
+        {
+          "preset": "cylFunc:pmisc:cwhite:f(z^2-z)*2,z*6.3+4.2",
+          "duration": "5",
+          "starttick": "0"
+        },
+        {
+          "preset": "cylFunc:pmisc:cwhite:f(z^2-z)*2,z*6.3+2.1",
+          "duration": "5",
+          "starttick": "0"
+        },
+        {
+          "preset": "sphFunc:pmisc:cred:f2*rand(),rand()*6.3,(0.5-rand())*(3.2):d0.05:atrue",
+          "duration": "5",
+          "starttick": "5"
+        }
+      ]
     },
     {
       "name": "icebeam",
-      "defaultanimation": "beam:misc:0.2"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0",
+          "applyAfter": "true"
+        }
+      ]
     },
     {
       "name": "iceburn",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "icepunch",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "iceshard",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "iciclecrash",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "icywind",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "irontail",
-      "defaultanimation": "pont:vsweepAttack"
+      "animations": [
+        {
+          "preset": "pont:psweepAttack",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "lavaplume",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "leafstorm",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow:pleaf",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "leechlife",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "leechseed",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "lightofruin",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "magmastorm",
-      "defaultanimation": "vlow"
+      "animations": [
+        {
+          "preset": "vlow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "magnetbomb",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "megadrain",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "metalburst",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "mirrorshot",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "mudbomb",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "nightshade",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "nightslash",
-      "defaultanimation": "pont:vsweepAttack"
+      "animations": [
+        {
+          "preset": "pont:psweepAttack",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "oblivionwing",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "ominouswind",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "paraboliccharge",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "petaldance",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "pinmissile",
-      "defaultanimation": "throw:w0.1"
+      "animations": [
+        {
+          "preset": "throw:w0.1",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "poisongas",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "poisonpowder",
-      "defaultanimation": "powder:pportal"
+      "animations": [
+        {
+          "preset": "powder:pportal",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "poisonsting",
-      "defaultanimation": "throw:w0.1"
+      "animations": [
+        {
+          "preset": "throw:w0.1",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "powdersnow",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "powergem",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "psybeam",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "psychocut",
-      "defaultanimation": "pont:vsweepAttack"
+      "animations": [
+        {
+          "preset": "pont:psweepAttack",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "psyshock",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "psywave",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "razorleaf",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow:pleaf",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "razorwind",
-      "defaultanimation": "flow:vsweepAttack"
+      "animations": [
+        {
+          "preset": "flow:psweepAttack",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "roaroftime",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "rockblast",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "rockslide",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "rockthrow",
-      "defaultanimation": "throw:w0.2"
+      "animations": [
+        {
+          "preset": "throw:w0.2",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "rocktomb",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "rockwrecker",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "sacredfire",
-      "defaultanimation": "flow:vflame:d10"
+      "animations": [
+        {
+          "preset": "flow:pflame:d10",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "sandtomb",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "scald",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "secretpower",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "seedflare",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "shadowball",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "simplebeam",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "slash",
-      "defaultanimation": "pont:vsweepAttack"
+      "animations": [
+        {
+          "preset": "pont:psweepAttack",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "sleeppowder",
-      "defaultanimation": "powder"
+      "animations": [
+        {
+          "preset": "powder",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "sludge",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "sludgebomb",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "sludgewave",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "smog",
-      "defaultanimation": "powder:psmoke"
+      "animations": [
+        {
+          "preset": "powder:psmoke",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "smokescreen",
-      "defaultanimation": "powder:plargesmoke"
+      "animations": [
+        {
+          "preset": "powder:plargesmoke",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "solarbeam",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "sonicboom",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "spacialrend",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "spark",
-      "defaultanimation": "pons"
+      "animations": [
+        {
+          "preset": "pons",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "spikecannon",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "spore",
-      "defaultanimation": "powder"
+      "animations": [
+        {
+          "preset": "powder",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "stoneedge",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "stunspore",
-      "defaultanimation": "powder"
+      "animations": [
+        {
+          "preset": "powder",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "supersonic",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "beam",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "swordsdance",
-      "defaultanimation": "pons"
+      "animations": [
+        {
+          "preset": "pons",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "thrash",
-      "defaultanimation": "pons"
+      "animations": [
+        {
+          "preset": "pons",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "thunder",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "thunder",
+          "duration": "0",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "thunderbolt",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "thunder",
+          "duration": "0",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "thunderpunch",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "thundershock",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "thunder",
+          "duration": "0",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "thunderwave",
-      "defaultanimation": "beam"
+      "animations": [
+        {
+          "preset": "thunder",
+          "duration": "0",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "toxic",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "twineedle",
-      "defaultanimation": "throw:w0.1"
+      "animations": [
+        {
+          "preset": "throw:w0.1",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "vacuumwave",
-      "defaultanimation": "flow"
+      "animations": [
+        {
+          "preset": "flow",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "venoshock",
-      "defaultanimation": "pont"
+      "animations": [
+        {
+          "preset": "pont",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "watergun",
-      "defaultanimation": "beam:splash"
+      "animations": [
+        {
+          "preset": "beam:psplash",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "watershuriken",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     },
     {
       "name": "zapcannon",
-      "defaultanimation": "throw"
+      "animations": [
+        {
+          "preset": "throw",
+          "duration": "5",
+          "starttick": "0"
+        }
+      ]
     }
   ]
 }

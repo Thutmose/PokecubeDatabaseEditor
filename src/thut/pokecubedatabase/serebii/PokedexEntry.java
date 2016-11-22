@@ -21,21 +21,23 @@ import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 
 public class PokedexEntry
 {
+    public static boolean         updateSizes = false;
+
     HashMap<String, PokedexEntry> formes;
     XMLPokedexEntry               entry;
-    public static IValueFixer     typeFixer = new IValueFixer()
-                                            {
-                                                @Override
-                                                public String fix(String input)
-                                                {
-                                                    String typeName = input
-                                                            .replace("/" + PokedexChecker.pokedex + "/", "")
-                                                            .replace(".shtml", "");
-                                                    typeName = Character.toUpperCase(typeName.charAt(0))
-                                                            + typeName.substring(1);
-                                                    return typeName;
-                                                }
-                                            };
+    public static IValueFixer     typeFixer   = new IValueFixer()
+                                              {
+                                                  @Override
+                                                  public String fix(String input)
+                                                  {
+                                                      String typeName = input
+                                                              .replace("/" + PokedexChecker.pokedex + "/", "")
+                                                              .replace(".shtml", "");
+                                                      typeName = Character.toUpperCase(typeName.charAt(0))
+                                                              + typeName.substring(1);
+                                                      return typeName;
+                                                  }
+                                              };
 
     public PokedexEntry(XMLPokedexEntry entry)
     {
