@@ -92,7 +92,7 @@ public class PokedexChecker
                         break;
                     }
                     entry = parseInitialRowsAndCreateEntry(rows, num);
-                    entry.entry.moves.misc.moves = null;
+                    if (entry.entry.moves.misc != null) entry.entry.moves.misc.moves = null;
                     break;
                 }
             }
@@ -154,7 +154,6 @@ public class PokedexChecker
                     Elements headers = rows.get(1).select("th");
                     boolean formeInfo = headers.get(headers.size() - 2).text().equals("Effect %")
                             && !firstLine.contains("Transfer Only Moves");
-                    System.out.println(firstLine);
                     for (int i = 0; i < rows.size(); i++)
                     {
                         Elements values = rows.get(i).select("td");
@@ -183,11 +182,8 @@ public class PokedexChecker
                         }
                         if (valid)
                         {
-
-                            System.out.println(move + " is valid for " + entry.entry.name);
                             entry.addOtherMove(move);
                         }
-                        else System.out.println(move + " is not valid for " + entry.entry.name);
                     }
                 }
                 if (firstLine.contains("Usable Z Moves"))
@@ -217,6 +213,18 @@ public class PokedexChecker
      * @param entry */
     public static void parseAbilitiesHappinessEVs(Elements rows, PokedexEntry entry)
     {
+        Elements expValues = null;
+        for (int i = 0; i < rows.size() - 1; i++)
+        {
+            Elements values = rows.get(i).select("td");
+            if (values.get(0).text().equals("Experience Growth"))
+            {
+                expValues = rows.get(i + 1).select("td");
+                break;
+            }
+        }
+        if (expValues == null) { return; }
+
         // Abilities, exp mode, base happiness, evs, does it
         // mega evolve.
         Elements values = rows.get(1).select("b");
@@ -240,7 +248,7 @@ public class PokedexChecker
         entry.setAbilities(false, normal);
         entry.setAbilities(true, hidden);
 
-        values = rows.get(3).select("td");
+        values = expValues;
 
         // Exp mode
         String text = values.get(0).text();

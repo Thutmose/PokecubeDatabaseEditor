@@ -28,9 +28,12 @@ public class ButtonHandler implements ActionListener
     {
         if (evt.getSource() == serebii.update)
         {
+            PokedexChecker.pokedex = "pokedex-xy";
             if (serebii.mode.getActionCommand().equals("All"))
             {
-                for (int i = 722; i <= SerebiiChecker.TOTALCOUNT; i++)
+                // for (int i = 722; i <= SerebiiChecker.TOTALCOUNT; i++)
+                // serebii.updatePokedexEntryFromSerebii(i);
+                for (int i = 1; i < 722; i++)
                     serebii.updatePokedexEntryFromSerebii(i);
             }
             else
