@@ -34,6 +34,20 @@ public class SerebiiChecker
         mergeAnims.addActionListener(handler);
     }
 
+    public void updatePokedexEntryFromSerebii(String name)
+    {
+        try
+        {
+            pokedex.parseForName(name);
+        }
+        catch (Exception e)
+        {
+            System.out.println(name + " Failed");
+            Main.instance.addToStatus(name + " Failed");
+            e.printStackTrace();
+        }
+    }
+
     public void updatePokedexEntryFromSerebii(int num)
     {
         try
@@ -43,6 +57,7 @@ public class SerebiiChecker
         catch (Exception e)
         {
             System.out.println(num + " Failed");
+            Main.instance.addToStatus(num + " Failed");
             e.printStackTrace();
         }
     }

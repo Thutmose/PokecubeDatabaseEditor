@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -212,6 +213,22 @@ public class XMLEntries
 
         public void init()
         {
+            entriesMap.clear();
+            Collections.sort(pokemon, new Comparator<XMLPokedexEntry>()
+            {
+                @Override
+                public int compare(XMLPokedexEntry o1, XMLPokedexEntry o2)
+                {
+                    int n1 = Integer.parseInt(o1.number);
+                    int n2 = Integer.parseInt(o2.number);
+                    int num = n1 - n2;
+                    if (num != 0) return num;
+                    if (o1.base != null && o2.base == null) return -10;
+                    if (o2.base != null && o1.base == null) return 10;
+                    return o1.name.compareTo(o2.name);
+                }
+            });
+
             for (int i = 0; i < pokemon.size(); i++)
             {
                 entriesMap.put(pokemon.get(i), i);
@@ -418,6 +435,7 @@ public class XMLEntries
         Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
         // output pretty printed
         jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        database.init();
 
         for (XMLPokedexEntry entry : database.pokemon)
         {

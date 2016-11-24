@@ -11,7 +11,11 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Entities.EscapeMode;
 import org.jsoup.select.Elements;
 
+import pokecube.core.database.moves.json.JsonMoves;
+import pokecube.core.database.moves.json.JsonMoves.MovesJson;
 import thut.pokecubedatabase.Main;
+import thut.pokecubedatabase.pokedex.XMLEntries;
+import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 
 public class PokedexChecker
 {
@@ -35,6 +39,21 @@ public class PokedexChecker
     {
     }
 
+    void parseForName(String name) throws IOException
+    {
+        XMLPokedexEntry old = XMLEntries.getDatabase(Main.pokedexfile).getEntry(name, -1, true, -1);
+        if (old == null) throw new IOException("Entry does not exist for " + name);
+        PokedexEntry entry = new PokedexEntry(old);
+        String numStr = entry.entry.number;
+        if (numStr.length() == 1) numStr = "00" + numStr;
+        else if (numStr.length() == 2) numStr = "0" + numStr;
+        // Make a URL to the web page
+        String html = "http://www.serebii.net/" + pokedex + "/" + numStr + ".shtml";
+        Document doc = Jsoup.connect(html).get();
+        doc.outputSettings().escapeMode(EscapeMode.xhtml);
+        parseEntry(entry, doc);
+    }
+
     void parseForNumber(int num) throws IOException
     {
         String numStr = "" + num;
@@ -44,8 +63,14 @@ public class PokedexChecker
         String html = "http://www.serebii.net/" + pokedex + "/" + numStr + ".shtml";
         Document doc = Jsoup.connect(html).get();
         doc.outputSettings().escapeMode(EscapeMode.xhtml);
-        Elements tables = doc.select("table");
+        PokedexEntry entry = createEntry(doc, num);
+        parseEntry(entry, doc);
+    }
+
+    private PokedexEntry createEntry(Document doc, int num)
+    {
         PokedexEntry entry = null;
+        Elements tables = doc.select("table");
         for (Element table : tables)
         {
             String attr2 = table.attr("class");
@@ -56,7 +81,6 @@ public class PokedexChecker
 
                 if (firstLine.contains("Mega Evolution"))
                 {
-                    // TODO make new thing for megas here.
                     break;
                 }
 
@@ -68,9 +92,27 @@ public class PokedexChecker
                         break;
                     }
                     entry = parseInitialRowsAndCreateEntry(rows, num);
+                    entry.entry.moves.misc.moves = null;
+                    break;
                 }
+            }
+        }
+        return entry;
+    }
 
+    private void parseEntry(PokedexEntry entry, Document doc)
+    {
+        Elements tables = doc.select("table");
+        MovesJson validMoves = JsonMoves.getMoves(Main.movesFile);
+        for (Element table : tables)
+        {
+            String attr2 = table.attr("class");
+            if (attr2.equals("dextable"))
+            {
+                Elements rows = table.select("tr");
+                String firstLine = rows.get(0).select("td").text();
                 if (entry == null) System.out.println("null?");
+                boolean alola = entry.entry.name.contains("Alola");
 
                 if (firstLine.contains("Abilities:"))
                 {
@@ -80,8 +122,8 @@ public class PokedexChecker
                 boolean lvlup = firstLine.contains("Level Up");
                 if (lvlup)
                 {
-                    if (firstLine.contains("Alola") && !(entry.entry.name.contains("Alolan"))) lvlup = false;
-                    else if (entry.entry.name.contains("Alolan") && !firstLine.contains("Alola")) lvlup = false;
+                    if (firstLine.contains("Alola") && !alola) lvlup = false;
+                    else if (alola && !firstLine.contains("Alola")) lvlup = false;
                 }
 
                 if (lvlup)
@@ -103,93 +145,56 @@ public class PokedexChecker
                         entry.addLvlMove(level, move);
                     }
                 }
-                if (firstLine.contains("TM & HM Attacks"))
+                if (firstLine.contains("TM & HM Attacks") || firstLine.contains("Egg Moves")
+                        || firstLine.contains("Move Tutor") || firstLine.contains("Special Moves")
+                        || firstLine.contains("Pre-Evolution Only Moves") || firstLine.contains("Transfer Only Moves"))
                 {
                     // TM moves
                     // TODO make this also check which forme before adding.
                     Elements headers = rows.get(1).select("th");
-                    int index = 2;
-                    if (headers.last().text().equals("Form")) index = 3;
-                    for (int i = 2; i + index - 1 < rows.size(); i += index)
+                    boolean formeInfo = headers.get(headers.size() - 2).text().equals("Effect %")
+                            && !firstLine.contains("Transfer Only Moves");
+                    System.out.println(firstLine);
+                    for (int i = 0; i < rows.size(); i++)
                     {
                         Elements values = rows.get(i).select("td");
-                        String move = values.get(1).text();
-                        boolean valid = true;
-                        if (index == 3)
+                        Elements vars = values.select("a");
+                        if (vars.isEmpty() || validMoves.getEntry(vars.get(0).text(), false) == null) continue;
+                        String move = vars.get(0).text();
+                        boolean valid = !formeInfo;
+                        if (!valid)
                         {
-                            valid = false;
-                            Elements formes = values.get(8).select("img");
-                            boolean normal = !entry.entry.name.contains("Alolan");
+                            Elements formes = values.select("img");
                             for (Element e : formes)
                             {
-                                if (e.text().contains("Alola") && !normal)
+                                String src = e.attr("src");
+                                if (!src.contains("/pokedex-sm/icon/")) continue;
+                                if (src.contains("-a") && alola)
                                 {
                                     valid = true;
                                     break;
                                 }
-                                if (!e.text().contains("Alola") && normal)
+                                if (!src.contains("-a") && !alola)
                                 {
                                     valid = true;
                                     break;
                                 }
                             }
                         }
-                        if (valid) entry.addOtherMove(move);
-                    }
-                }
-                if (firstLine.contains("Egg Moves") || firstLine.contains("Move Tutor")
-                        || firstLine.contains("Special Moves"))
-                {
-                    // Egg moves
-                    // TODO make this also check which forme before adding.
-                    Elements headers = rows.get(1).select("th");
-                    int index = 2;
-                    if (headers.last().text().equals("Form")) index = 3;
-                    for (int i = index; i + 1 < rows.size(); i += 2)
-                    {
-                        Elements values = rows.get(i).select("td");
-                        String move = values.get(0).text();
-                        boolean valid = false;
-                        Elements formes = values.select("img");
-                        int n = 0;
-                        boolean normal = !entry.entry.name.contains("Alolan");
-                        for (Element e : formes)
+                        if (valid)
                         {
-                            if (!e.attr("src").contains("icon")) continue;
-                            n++;
-                            String name = e.attr("title");
-                            if (name.contains("Alola") && !normal)
-                            {
-                                valid = true;
-                                break;
-                            }
-                            if (!name.contains("Alola") && normal)
-                            {
-                                valid = true;
-                                break;
-                            }
+
+                            System.out.println(move + " is valid for " + entry.entry.name);
+                            entry.addOtherMove(move);
                         }
-                        if (n == 0) valid = true;
-                        if (valid) entry.addOtherMove(move);
+                        else System.out.println(move + " is not valid for " + entry.entry.name);
                     }
                 }
                 if (firstLine.contains("Usable Z Moves"))
                 {
                     // Z Moves
                 }
-                if (firstLine.contains("Transfer Only Moves") || firstLine.contains("Pre-Evolution Only Moves"))
-                {
-                    // th is more than 0 means there is another header there, so
-                    // we need to increment down 1
-                    int startIndex = rows.get(2).select("th").size() == 0 ? 2 : 3;
-                    // Other move tutor or tm moves.
-                    for (int i = startIndex; i + 1 < rows.size(); i += 2)
-                    {
-                        Elements values = rows.get(i).select("td");
-                        String move = values.get(0).text();
-                        entry.addOtherMove(move);
-                    }
-                }
+
                 if (firstLine.equals("Stats"))
                 {
                     // Stats
@@ -203,7 +208,6 @@ public class PokedexChecker
         }
         entry.editDatabase();
         Main.instance.setStatus("Updated " + entry.entry.name);
-
     }
 
     /** Parse through and fill in the abilities, exp mode, happiness, evs, and
@@ -302,7 +306,7 @@ public class PokedexChecker
         name = name.replace(genders[0], 'M');
         name = name.replace(genders[1], 'F');
         entry = new PokedexEntry(name, num);
-        //TODO output this to many, many lang files at once.
+        // TODO output this to many, many lang files at once.
         System.out.println("pkmn." + name + ".name=" + name);
 
         // Set genders

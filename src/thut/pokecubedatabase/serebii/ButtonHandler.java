@@ -6,6 +6,8 @@ import java.io.File;
 
 import pokecube.core.database.moves.json.JsonMoves;
 import thut.pokecubedatabase.Main;
+import thut.pokecubedatabase.pokedex.XMLEntries;
+import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 
 public class ButtonHandler implements ActionListener
 {
@@ -29,7 +31,10 @@ public class ButtonHandler implements ActionListener
             else
             {
                 int num = Integer.parseInt(Main.instance.number.getText());
-                serebii.updatePokedexEntryFromSerebii(num);
+                String name = Main.instance.name.getText();
+                XMLPokedexEntry old = XMLEntries.getDatabase(Main.pokedexfile).getEntry(null, num, false, -1);
+                if (old != null && !old.name.equals(name)) serebii.updatePokedexEntryFromSerebii(name);
+                else serebii.updatePokedexEntryFromSerebii(num);
             }
             return;
         }

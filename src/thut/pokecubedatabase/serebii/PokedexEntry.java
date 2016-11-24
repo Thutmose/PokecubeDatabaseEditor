@@ -239,6 +239,7 @@ public class PokedexEntry
 
     public void addOtherMove(String move)
     {
+        if (move.length() == 121) Thread.dumpStack();
         if (entry.moves.misc.moves == null)
         {
             entry.moves.misc.moves = move;
@@ -363,7 +364,13 @@ public class PokedexEntry
         {
             if (evs[i] > 0)
             {
-                entry.stats.evs.values.put(new QName(Main.statsNames[i]), evs[i] + "");
+                try
+                {
+                    entry.stats.evs.values.put(new QName(Main.statsNames[i]), evs[i] + "");
+                }
+                catch (Exception e)
+                {
+                }
             }
         }
         if (!ev)
