@@ -15,6 +15,7 @@ public class SerebiiChecker
     Button            mode;
     Button            updateMoves;
     Button            mergeAnims;
+    Button            outputLang;
     ButtonHandler     handler;
     PokedexChecker    pokedex    = new PokedexChecker();
     MovesChecker      moves      = new MovesChecker();
@@ -28,10 +29,12 @@ public class SerebiiChecker
         panel.add(update = new Button("Update From Serebii"));
         panel.add(updateMoves = new Button("Update Moves"));
         panel.add(mergeAnims = new Button("Merge Animations"));
+        panel.add(outputLang = new Button("Output Lang"));
         mode.addActionListener(handler);
         update.addActionListener(handler);
         updateMoves.addActionListener(handler);
         mergeAnims.addActionListener(handler);
+        outputLang.addActionListener(handler);
     }
 
     public void updatePokedexEntryFromSerebii(String name)

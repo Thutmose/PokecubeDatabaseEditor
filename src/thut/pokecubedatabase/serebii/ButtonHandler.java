@@ -3,8 +3,13 @@ package thut.pokecubedatabase.serebii;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import pokecube.core.database.moves.json.JsonMoves;
+import pokecube.core.database.moves.json.JsonMoves.MoveJsonEntry;
+import pokecube.core.database.moves.json.JsonMoves.MovesJson;
 import thut.pokecubedatabase.Main;
 import thut.pokecubedatabase.pokedex.XMLEntries;
 import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
@@ -72,6 +77,30 @@ public class ButtonHandler implements ActionListener
             {
                 e.printStackTrace();
             }
+        }
+        else if (evt.getSource() == serebii.outputLang)
+        {
+            File mobsLang = new File("./en_US_mobs.lang");
+            File movesLang = new File("./en_US_moves.lang");
+
+            MovesJson validMoves = JsonMoves.getMoves(Main.movesFile);
+            try
+            {
+                FileWriter writer = new FileWriter(movesLang);
+                PrintWriter out = new PrintWriter(writer);
+                out.println("#Pokecube translation");
+                for (MoveJsonEntry move : validMoves.moves)
+                {
+                    out.println("pokemob.move." + move.name + "=" + move.readableName);
+                }
+                writer.close();
+                out.close();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
         }
     }
 
