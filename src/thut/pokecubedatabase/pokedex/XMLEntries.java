@@ -270,6 +270,8 @@ public class XMLEntries
         public List<Drop>        held           = new ArrayList<>();
         @XmlElement(name = "lootTable")
         public String            lootTable;
+        @XmlElement(name = "heldTable")
+        public String            heldTable;
         // Spawn Rules
         @XmlAttribute
         public Boolean           overwrite      = false;
@@ -899,6 +901,7 @@ public class XMLEntries
             if (f.getName().equals("drops")) DROPS.add(f);
             if (f.getName().equals("held")) DROPS.add(f);
             if (f.getName().equals("lootTable")) DROPS.add(f);
+            if (f.getName().equals("heldTable")) DROPS.add(f);
 
             if (f.getName().equals("evolutions")) EVOLS.add(f);
             if (f.getName().equals("megaRules")) EVOLS.add(f);
