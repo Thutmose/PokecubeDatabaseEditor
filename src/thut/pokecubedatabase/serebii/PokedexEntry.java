@@ -3,7 +3,6 @@ package thut.pokecubedatabase.serebii;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +16,7 @@ import pokecube.core.database.moves.json.JsonMoves;
 import pokecube.core.database.moves.json.JsonMoves.IValueFixer;
 import thut.pokecubedatabase.Main;
 import thut.pokecubedatabase.pokedex.XMLEntries;
+import thut.pokecubedatabase.pokedex.XMLEntries.StatsNode.Stats;
 import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 
 public class PokedexEntry
@@ -60,7 +60,7 @@ public class PokedexEntry
                 }
                 catch (Exception e)
                 {
-                    System.err.println("Error with " + f1.getName() + " " + f1.getType() + " " + f1.get(o1));
+//                    System.err.println("Error with " + f1.getName() + " " + f1.getType() + " " + f1.get(o1));
                 }
             }
         }
@@ -68,15 +68,30 @@ public class PokedexEntry
 
     public PokedexEntry(String name, int number)
     {
-        XMLPokedexEntry old = XMLEntries.getDatabase(Main.pokedexfile).getEntry(name, number, false, -1);
+        if (name.startsWith("Mega "))
+        {
+            String suffix = " Mega";
+            if (name.endsWith(" X"))
+            {
+                suffix = suffix + "-X";
+                name = name.substring(0, name.length() - 2);
+            }
+            if (name.endsWith(" Y"))
+            {
+                suffix = suffix + "-Y";
+                name = name.substring(0, name.length() - 2);
+            }
+            name = name.replaceFirst("Mega ", "") + suffix;
+        }
+        XMLPokedexEntry old = XMLEntries.getDatabase(Main.pokedexfile).getEntry(name, number, true, -1);
         if (old != null) entry = old;
         else
         {
             entry = new XMLPokedexEntry();
             Main.instance.addToStatus("Creating new Entry for " + name);
             entry.name = name;
-            entry.number = number + "";
-            entry.base = "true";
+            entry.number = number;
+            entry.base = true;
             for (Field f : XMLPokedexEntry.class.getFields())
             {
                 try
@@ -85,25 +100,11 @@ public class PokedexEntry
                 }
                 catch (Exception e)
                 {
-                    System.err.println("Error with " + f.getName());
+                    System.err.println("Error with " + f.getName() + " " + e);
                 }
             }
             XMLEntries.getDatabase(Main.pokedexfile).pokemon.add(entry);
-            XMLEntries.getDatabase(Main.pokedexfile).pokemon.sort(new Comparator<XMLPokedexEntry>()
-            {
-                @Override
-                public int compare(XMLPokedexEntry o1, XMLPokedexEntry o2)
-                {
-                    int num1 = Integer.parseInt(o1.number);
-                    int num2 = Integer.parseInt(o2.number);
-                    if (num1 != num2) return num1 - num2;
-                    int diff = 0;
-                    if (Boolean.parseBoolean(o1.base) && !Boolean.parseBoolean(o2.base)) diff = -1;
-                    else if (Boolean.parseBoolean(o2.base) && !Boolean.parseBoolean(o1.base)) diff = 1;
-                    if (diff != 0) return diff;
-                    return o1.name.compareTo(o2.name);
-                }
-            });
+            XMLEntries.getDatabase(Main.pokedexfile).pokemon.sort(XMLEntries.ENTRYSORTER);
             XMLEntries.getDatabase(Main.pokedexfile).init();
         }
     }
@@ -126,7 +127,7 @@ public class PokedexEntry
             if (!male.isEmpty())
             {
                 float f = Float.parseFloat(female);
-                entry.stats.genderRatio = (int) (f * 254 / 100) + "";
+                entry.stats.genderRatio = (int) (f * 254 / 100);
             }
         }
 
@@ -146,13 +147,13 @@ public class PokedexEntry
         matcher = Pattern.compile(pattern).matcher(classInfo);
         if (matcher.find())
         {
-            entry.stats.mass = Float.parseFloat(matcher.group().replace("kg", "")) + "";
+            entry.stats.mass = Float.parseFloat(matcher.group().replace("kg", ""));
         }
         pattern = "kg \\d+ ";
         matcher = Pattern.compile(pattern).matcher(classInfo);
         if (matcher.find())
         {
-            entry.stats.captureRate = Integer.parseInt(matcher.group().replace("kg ", "").trim()) + "";
+            entry.stats.captureRate = Integer.parseInt(matcher.group().replace("kg ", "").trim());
         }
 
         String abilityInfo = text.substring(classEnd + "Abilities: ".length());
@@ -206,6 +207,10 @@ public class PokedexEntry
     public void setType(int index, String type)
     {
         String key = index == 0 ? "type1" : "type2";
+        if (entry.stats.types == null)
+        {
+            entry.stats.types = new Stats();
+        }
         if (type != null && !type.isEmpty()) entry.stats.types.values.put(new QName(key), typeFixer.fix(type));
         else entry.stats.types.values.remove(new QName(key), type);
     }
@@ -213,13 +218,17 @@ public class PokedexEntry
     public void setAbilities(boolean hidden, String abilities)
     {
         String key = hidden ? "hidden" : "normal";
+        if (entry.stats.abilities == null)
+        {
+            entry.stats.abilities = new Stats();
+        }
         if (abilities != null && !abilities.isEmpty()) entry.stats.abilities.values.put(new QName(key), abilities);
         else entry.stats.abilities.values.remove(new QName(key), abilities);
     }
 
     public void setBaseStat(int index, String stat)
     {
-        entry.stats.stats.values.put(new QName(Main.statsNames[index]), stat);
+        if (entry.stats.stats != null) entry.stats.stats.values.put(new QName(Main.statsNames[index]), stat);
     }
 
     public void clearMoves()
@@ -237,9 +246,30 @@ public class PokedexEntry
         else entry.moves.lvlupMoves.values.put(key, old + "," + JsonMoves.convertMoveName(move));
     }
 
+    public void addEvolutionMove(String move)
+    {
+        if (entry.moves.evolutionMoves == null)
+        {
+            entry.moves.evolutionMoves = move;
+        }
+        else
+        {
+            String[] moves = entry.moves.evolutionMoves.split(", ");
+            Set<String> moveset = new HashSet<>();
+            for (String s : moves)
+                moveset.add(JsonMoves.convertMoveName(s));
+            move = JsonMoves.convertMoveName(move);
+            moveset.add(move);
+            List<String> movesList = new ArrayList<>(moveset);
+            Collections.sort(movesList);
+            entry.moves.evolutionMoves = movesList.get(0);
+            for (int i = 1; i < movesList.size(); i++)
+                entry.moves.evolutionMoves = entry.moves.evolutionMoves + ", " + movesList.get(i);
+        }
+    }
+
     public void addOtherMove(String move)
     {
-        if (move.length() == 121) Thread.dumpStack();
         if (entry.moves.misc.moves == null)
         {
             entry.moves.misc.moves = move;
@@ -265,7 +295,7 @@ public class PokedexEntry
         String val = matcher.group().replace("Points ", "");
         String val2 = val.substring(0, val.lastIndexOf(" "));
         entry.stats.expMode = val2.substring(0, val2.lastIndexOf(" "));
-        entry.stats.baseFriendship = Integer.parseInt(val2.replace(entry.stats.expMode, "").trim()) + "";
+        entry.stats.baseFriendship = Integer.parseInt(val2.replace(entry.stats.expMode, "").trim());
         val = info.substring(info.indexOf(val) + val.length() - 1, info.lastIndexOf("(s)")).replace("(s)", "");
 
     }

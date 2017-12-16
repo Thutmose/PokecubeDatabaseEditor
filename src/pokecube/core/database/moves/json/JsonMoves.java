@@ -82,6 +82,15 @@ public class JsonMoves
         public String              zVersion;
 
         public String              defaultanimation;
+        public String              soundEffectSource;
+        public String              soundEffectTarget;
+
+        public boolean             multiTarget     = false;
+        public boolean             interceptable   = true;
+        public String              preset;
+        public boolean             ohko            = false;
+        public boolean             protectionMoves = false;
+        public int                 extraInfo       = -1;
         public List<AnimationJson> animations;
     }
 
@@ -175,14 +184,16 @@ public class JsonMoves
         catch (Exception e)
         {
             e.printStackTrace();
+//            PokecubeMod.log(Level.WARNING, "Error with read " + file, e);
             moves = new MovesJson();
             try
             {
                 write(file);
             }
-            catch (IOException e1)
+            catch (Exception e1)
             {
                 e1.printStackTrace();
+//                PokecubeMod.log(Level.WARNING, "Error with write " + file, e);
             }
         }
     }

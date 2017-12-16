@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,7 +44,7 @@ import thut.pokecubedatabase.serebii.SerebiiChecker;
 public class Main extends Frame implements ActionListener, WindowListener
 {
 
-    final static String                     defaultPokemobsFile = "pokemobs.xml";
+    final static String                     defaultPokemobsFile = "pokemobs.json";
     final static String                     defaultMovesFile    = "moves.json";
     public static Main                      instance;
     public static File                      pokedexfile         = new File("./" + defaultPokemobsFile);
@@ -546,10 +545,10 @@ public class Main extends Frame implements ActionListener, WindowListener
             {
                 String selectedItem = moveNodeOptions.getSelectedItem();
                 String selectedAtrib = attribChoice.getSelectedItem();
+                Field selected = Moves.class.getDeclaredField(selectedItem);
+                Object value = selected.get(entry.moves);
                 if (selectedAtrib != null)
                 {
-                    Field selected = Moves.class.getDeclaredField(selectedItem);
-                    Object value = selected.get(entry.moves);
                     if (value instanceof LvlUp)
                     {
                         LvlUp stat = (LvlUp) value;
@@ -557,6 +556,13 @@ public class Main extends Frame implements ActionListener, WindowListener
                         nodeLabel.setText(selectedAtrib);
                         if (val != null) info.setText(val);
                     }
+                }
+                else
+                {
+                    nodeLabel.setText("");
+                    info.setText("");
+                    System.out.println(value);
+                    info.setText(value.toString());
                 }
             }
         }
@@ -607,7 +613,7 @@ public class Main extends Frame implements ActionListener, WindowListener
     {
     }
 
-    public void writeXML(File file) throws JAXBException
+    public void writeXML(File file) throws Exception
     {
         XMLEntries.write(file);
     }

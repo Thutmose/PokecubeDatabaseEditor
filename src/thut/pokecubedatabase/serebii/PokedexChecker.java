@@ -1,7 +1,11 @@
 package thut.pokecubedatabase.serebii;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -20,9 +24,12 @@ import thut.pokecubedatabase.pokedex.XMLEntries.XMLPokedexEntry;
 public class PokedexChecker
 {
 
-    static HashSet<String> movesets = new HashSet<>();
-    public static String   pokedex  = "pokedex-sm";   // pokedex-xy
-    public static String   typeLoc  = "pokedex-bw";
+    static HashSet<String> movesets        = new HashSet<>();
+    static HashSet<String> move_sections   = new HashSet<>();
+    static HashSet<String> z_move_sections = new HashSet<>();
+    static HashSet<String> other_forms     = new HashSet<>();
+    public static String   pokedex         = "pokedex-sm";   // pokedex-xy
+    public static String   typeLoc         = "pokedex-bw";
 
     static
     {
@@ -33,6 +40,44 @@ public class PokedexChecker
         movesets.add("Pre-Evolution Only Moves");
         movesets.add("Transfer Only Moves");
         movesets.add("Stats");
+
+        move_sections.add("Generation VI Level Up");
+        move_sections.add("Generation VII Level Up");
+        move_sections.add("Sun/Moon Level Up");
+        move_sections.add("Ultra Sun/Ultra Moon Level Up");
+        move_sections.add("Special Moves");
+        move_sections.add("Move Tutor");
+        move_sections.add("Egg Moves");
+        move_sections.add("TM & HM Attacks");
+        move_sections.add("Pre-Evolution Only Moves");
+        move_sections.add("Transfer Only Moves");
+        move_sections.add("Ultra Sun/Ultra Moon Move Tutor Attacks");
+
+        z_move_sections.add("Usable Z Moves");
+        z_move_sections.add("Usable Z Moves (Transfer Only/Improved)");
+
+        other_forms.add("Mega Evolution");
+        other_forms.add("Mega Evolution X");
+        other_forms.add("Mega Evolution Y");
+        other_forms.add("Primal Reversion");
+    }
+
+    static boolean isMovesSection(String line)
+    {
+        for (String s : move_sections)
+        {
+            if (line.contains(s)) return true;
+        }
+        return false;
+    }
+
+    static boolean isZMovesSection(String line)
+    {
+        for (String s : z_move_sections)
+        {
+            if (line.contains(s)) return true;
+        }
+        return false;
     }
 
     public PokedexChecker()
@@ -44,14 +89,7 @@ public class PokedexChecker
         XMLPokedexEntry old = XMLEntries.getDatabase(Main.pokedexfile).getEntry(name, -1, true, -1);
         if (old == null) throw new IOException("Entry does not exist for " + name);
         PokedexEntry entry = new PokedexEntry(old);
-        String numStr = entry.entry.number;
-        if (numStr.length() == 1) numStr = "00" + numStr;
-        else if (numStr.length() == 2) numStr = "0" + numStr;
-        // Make a URL to the web page
-        String html = "http://www.serebii.net/" + pokedex + "/" + numStr + ".shtml";
-        Document doc = Jsoup.connect(html).get();
-        doc.outputSettings().escapeMode(EscapeMode.xhtml);
-        parseEntry(entry, doc);
+        parseForNumber(entry.entry.number);
     }
 
     void parseForNumber(int num) throws IOException
@@ -63,14 +101,17 @@ public class PokedexChecker
         String html = "http://www.serebii.net/" + pokedex + "/" + numStr + ".shtml";
         Document doc = Jsoup.connect(html).get();
         doc.outputSettings().escapeMode(EscapeMode.xhtml);
-        PokedexEntry entry = createEntry(doc, num);
-        parseEntry(entry, doc);
+        PokedexEntry[] entries = createEntry(doc, num);
+        for (PokedexEntry entry : entries)
+            parseEntry(entry, doc);
     }
 
-    private PokedexEntry createEntry(Document doc, int num)
+    private PokedexEntry[] createEntry(Document doc, int num)
     {
-        PokedexEntry entry = null;
+        List<PokedexEntry> entries = new ArrayList<>();
         Elements tables = doc.select("table");
+        PokedexEntry entry;
+        Elements baseRow = null;
         for (Element table : tables)
         {
             String attr2 = table.attr("class");
@@ -78,32 +119,142 @@ public class PokedexChecker
             {
                 Elements rows = table.select("tr");
                 String firstLine = rows.get(0).select("td").text();
-
-                if (firstLine.contains("Mega Evolution"))
+                if (firstLine.contains("Picture Name Other Names") || other_forms.contains(firstLine))
                 {
-                    break;
-                }
-
-                if (firstLine.contains("Picture Name Other Names"))
-                {
-                    if (entry != null)
+                    String mega = null;
+                    if (firstLine.contains("Mega"))
                     {
-                        System.out.println("duplicate? " + entry.entry.name);
-                        break;
+                        mega = "Mega";
+                        if (firstLine.contains("X"))
+                        {
+                            mega = mega + "-X";
+                        }
+                        if (firstLine.contains("Y"))
+                        {
+                            mega = mega + "-Y";
+                        }
                     }
-                    entry = parseInitialRowsAndCreateEntry(rows, num);
-                    if (entry.entry.moves.misc != null) entry.entry.moves.misc.moves = null;
-                    break;
+                    else if (firstLine.contains("Primal")) mega = "Primal";
+                    if (baseRow == null) baseRow = rows;
+                    entry = parseInitialRowsAndCreateEntry(rows, num, other_forms.contains(firstLine) ? 2 : 1, false,
+                            mega);
+                    entries.add(entry);
+                }
+                if (firstLine.startsWith("Stats - Alola"))
+                {
+                    entry = parseInitialRowsAndCreateEntry(baseRow, num, 1, true, null);
+                    entries.add(entry);
                 }
             }
         }
-        return entry;
+        return entries.toArray(new PokedexEntry[0]);
+    }
+
+    private static void parseMoves(PokedexEntry entry, Elements rows, String firstLine, MovesJson validMoves)
+    {
+        boolean alola = entry.entry.name.contains("Alola");
+        boolean lvlup = firstLine.contains("Level Up");
+        if (lvlup)
+        {
+            if (firstLine.contains("Alola") && !alola) lvlup = false;
+            else if (alola && !firstLine.contains("Alola")) lvlup = false;
+        }
+
+        if (lvlup)
+        {
+            // Level up moves, clear them first.
+            entry.entry.moves.lvlupMoves.values.clear();
+            for (int i = 2; i + 1 < rows.size(); i += 2)
+            {
+                Elements values = rows.get(i).select("td");
+                String var = values.get(0).text();
+                int level = 1;
+                try
+                {
+                    level = Integer.parseInt(var);
+                }
+                catch (NumberFormatException e)
+                {
+                    if (var.equals("Evolve")) level = -1;
+                }
+                String move = values.get(1).text();
+                if (level > 0)
+                {
+                    entry.addLvlMove(level, move);
+                }
+                else
+                {
+                    entry.addEvolutionMove(move);
+                }
+            }
+        }
+        if (isMovesSection(firstLine))
+        {
+            // TM moves
+            // TODO make this also check which forme before adding.
+            boolean formeInfo = false;
+            try
+            {
+                Elements headers = rows.get(1).select("th");
+                formeInfo = headers.get(headers.size() - 2).text().equals("Effect %")
+                        && !firstLine.contains("Transfer Only Moves");
+            }
+            catch (Exception e1)
+            {
+                e1.printStackTrace();
+                return;
+            }
+            for (int i = 0; i < rows.size(); i++)
+            {
+                Elements values = rows.get(i).select("td");
+                Elements vars = values.select("a");
+                if (vars.isEmpty() || validMoves.getEntry(vars.get(0).text(), false) == null) continue;
+                String move = vars.get(0).text();
+                boolean valid = !formeInfo;
+                if (!valid)
+                {
+                    Elements formes = values.select("img");
+                    for (Element e : formes)
+                    {
+                        String src = e.attr("src");
+                        if (!src.contains("/pokedex-sm/icon/")) continue;
+                        if (src.contains("-a") && alola)
+                        {
+                            valid = true;
+                            break;
+                        }
+                        if (!src.contains("-a") && !alola)
+                        {
+                            valid = true;
+                            break;
+                        }
+                    }
+                }
+                if (valid)
+                {
+                    entry.addOtherMove(move);
+                }
+            }
+        }
+        else if (isZMovesSection(firstLine))
+        {
+            // Z Moves
+        }
     }
 
     private void parseEntry(PokedexEntry entry, Document doc)
     {
         Elements tables = doc.select("table");
         MovesJson validMoves = JsonMoves.getMoves(Main.movesFile);
+        boolean erroredMoves = false;
+        if (entry == null) System.out.println("null?");
+        boolean base = entry.entry.base == null ? false : entry.entry.base;
+        boolean mega = !base && entry.entry.name.contains(" Mega");
+        boolean primal = !base && entry.entry.name.contains(" Primal");
+        boolean abilities = true;
+
+        String stats = mega ? "Stats - Mega Evolution" : primal ? "Stats - Primal Reversion" : "Stats";
+        System.out.println(entry.entry.name);
         for (Element table : tables)
         {
             String attr2 = table.attr("class");
@@ -111,87 +262,24 @@ public class PokedexChecker
             {
                 Elements rows = table.select("tr");
                 String firstLine = rows.get(0).select("td").text();
-                if (entry == null) System.out.println("null?");
-                boolean alola = entry.entry.name.contains("Alola");
 
-                if (firstLine.contains("Abilities:"))
+                if (firstLine.contains("Abilities:") && abilities)
                 {
                     parseAbilitiesHappinessEVs(rows, entry);
+                    abilities = mega || primal;
                 }
 
-                boolean lvlup = firstLine.contains("Level Up");
-                if (lvlup)
+                if (!erroredMoves) try
                 {
-                    if (firstLine.contains("Alola") && !alola) lvlup = false;
-                    else if (alola && !firstLine.contains("Alola")) lvlup = false;
+                    parseMoves(entry, rows, firstLine, validMoves);
+                }
+                catch (Exception e)
+                {
+                    erroredMoves = true;
+                    System.out.println("error with moves for " + entry.entry.name);
                 }
 
-                if (lvlup)
-                {
-                    // Level up moves, clear them first.
-                    entry.entry.moves.lvlupMoves.values.clear();
-                    for (int i = 2; i + 1 < rows.size(); i += 2)
-                    {
-                        Elements values = rows.get(i).select("td");
-                        int level = 1;
-                        try
-                        {
-                            level = Integer.parseInt(values.get(0).text());
-                        }
-                        catch (NumberFormatException e)
-                        {
-                        }
-                        String move = values.get(1).text();
-                        entry.addLvlMove(level, move);
-                    }
-                }
-                if (firstLine.contains("TM & HM Attacks") || firstLine.contains("Egg Moves")
-                        || firstLine.contains("Move Tutor") || firstLine.contains("Special Moves")
-                        || firstLine.contains("Pre-Evolution Only Moves") || firstLine.contains("Transfer Only Moves"))
-                {
-                    // TM moves
-                    // TODO make this also check which forme before adding.
-                    Elements headers = rows.get(1).select("th");
-                    boolean formeInfo = headers.get(headers.size() - 2).text().equals("Effect %")
-                            && !firstLine.contains("Transfer Only Moves");
-                    for (int i = 0; i < rows.size(); i++)
-                    {
-                        Elements values = rows.get(i).select("td");
-                        Elements vars = values.select("a");
-                        if (vars.isEmpty() || validMoves.getEntry(vars.get(0).text(), false) == null) continue;
-                        String move = vars.get(0).text();
-                        boolean valid = !formeInfo;
-                        if (!valid)
-                        {
-                            Elements formes = values.select("img");
-                            for (Element e : formes)
-                            {
-                                String src = e.attr("src");
-                                if (!src.contains("/pokedex-sm/icon/")) continue;
-                                if (src.contains("-a") && alola)
-                                {
-                                    valid = true;
-                                    break;
-                                }
-                                if (!src.contains("-a") && !alola)
-                                {
-                                    valid = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (valid)
-                        {
-                            entry.addOtherMove(move);
-                        }
-                    }
-                }
-                if (firstLine.contains("Usable Z Moves"))
-                {
-                    // Z Moves
-                }
-
-                if (firstLine.equals("Stats"))
+                if (firstLine.equals(stats))
                 {
                     // Stats
                     Elements values = rows.get(2).select("td");
@@ -256,7 +344,7 @@ public class PokedexChecker
         entry.entry.stats.expMode = text.substring(index, text.length()).trim();
 
         // Base Happiness
-        entry.entry.stats.baseFriendship = values.get(1).text().trim();
+        entry.entry.stats.baseFriendship = Integer.parseInt(values.get(1).text().trim());
 
         // EVs
         // This means it doesn't have other formes listed.
@@ -266,12 +354,39 @@ public class PokedexChecker
         }
         else
         {
+            Pattern numMatcher = Pattern.compile("[0-9]");
             // TODO make this allow selecting which forme to pick
             // from the set.
-            String forme1 = values.get(2).select("b").get(1).text();
-            String forme = values.get(2).select("b").get(0).text();
-            String val = values.get(2).text().replace(forme, "").trim();
-            entry.parseEVs(val.substring(0, val.indexOf(forme1)));
+            Element nums0 = values.get(2);
+            String line = nums0.select("td").html().replaceAll("<b>", "").replaceAll("</b>", "");
+            String[] lines = line.split("<br>");
+            List<String> evs = new ArrayList<>();
+            List<String> forms = new ArrayList<>();
+            line = "";
+            for (String s : lines)
+            {
+                Matcher match = numMatcher.matcher(s);
+                if (!match.find())
+                {
+                    if (!line.isEmpty())
+                    {
+                        evs.add(line.trim());
+                    }
+                    forms.add(s);
+                    line = "";
+                }
+                else
+                {
+                    line = line + " " + s;
+                }
+            }
+            if (!line.isEmpty()) evs.add(line.trim());
+            if (evs.size() != forms.size())
+            {
+                forms.add(0, "Normal");
+            }
+            System.out.println(evs);
+            System.out.println(forms);
         }
     }
 
@@ -280,13 +395,16 @@ public class PokedexChecker
      * 
      * @param rows
      * @param num
+     * @param val
+     * @param mega
      * @return */
-    private static PokedexEntry parseInitialRowsAndCreateEntry(Elements rows, int num)
+    private static PokedexEntry parseInitialRowsAndCreateEntry(Elements rows, int num, int val, boolean alolan,
+            String mega)
     {
         PokedexEntry entry = null;
         // Name, gender, types, capture rate, mass, egg time,
         // size
-        Elements values = rows.get(1).select("td");
+        Elements values = rows.get(val).select("td");
         String name = values.get(3).text();
 
         // This is used to replace symbols with M and F in names
@@ -313,34 +431,36 @@ public class PokedexChecker
         }
         name = name.replace(genders[0], 'M');
         name = name.replace(genders[1], 'F');
+        if (alolan) name = name + " Alola";
+        // if (mega != null)
+        // {
+        // name = name + " " + mega;
+        // }
         entry = new PokedexEntry(name, num);
-        // TODO output this to many, many lang files at once.
-        System.out.println("pkmn." + name + ".name=" + name);
-
         // Set genders
         if (!male.isEmpty())
         {
             float f = Float.parseFloat(female);
-            entry.entry.stats.genderRatio = (int) (f * 254 / 100) + "";
+            entry.entry.stats.genderRatio = (int) (f * 254 / 100);
         }
-
-        // Set Types
         int index = values.size() - 1;//
         String test = values.get(index - 1).text();
         if (!test.contains("%") && !test.contains("Genderless"))
         {
             index -= 2;
         }
-        Element e = values.get(index);
+        // Set Types
+        Element e = values.get(alolan ? index + 2 : index);
         Elements types = e.select("a");
         String type1 = types.get(0).attr("href");
         String type2 = types.size() < 2 ? null : types.get(1).attr("href");
+
         entry.setType(0, type1);
         entry.setType(1, type2);
         values = rows.get(rows.size() - 1).select("td");
 
         // Height
-        if (entry.entry.stats.sizes.values.isEmpty())
+        if (entry.entry.stats.sizes != null && entry.entry.stats.sizes.values.isEmpty())
         {
             String[] vals = values.get(1).text().split(" ");
             String size = null;
@@ -371,12 +491,35 @@ public class PokedexChecker
         }
         if (mass != null)
         {
-            entry.entry.stats.mass = mass;
+            entry.entry.stats.mass = Float.parseFloat(mass);
         }
 
         // Capture rate.
         String captureRate = values.get(3).text();
-        entry.entry.stats.captureRate = captureRate;
+        try
+        {
+            entry.entry.stats.captureRate = Integer.parseInt(captureRate);
+        }
+        catch (NumberFormatException e1)
+        {
+            Pattern matcher = Pattern.compile("[0-9].");
+            Matcher match = matcher.matcher(captureRate);
+            if (match.find())
+            {
+                entry.entry.stats.captureRate = Integer.parseInt(match.group());
+            }
+            else
+            {
+                System.err.println("error with capture rate for " + entry.entry.name);
+                entry.entry.stats.captureRate = 3;
+            }
+        }
         return entry;
+    }
+
+    static Element findValue(int row, int column, Elements table)
+    {
+        Elements r = table.get(row).select("td");
+        return r.get(column);
     }
 }
