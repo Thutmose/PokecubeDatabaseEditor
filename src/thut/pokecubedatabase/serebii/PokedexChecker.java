@@ -506,7 +506,7 @@ public class PokedexChecker
             Matcher match = matcher.matcher(captureRate);
             if (match.find())
             {
-                entry.entry.stats.captureRate = Integer.parseInt(match.group());
+                entry.entry.stats.captureRate = Integer.parseInt(match.group().trim());
             }
             else
             {

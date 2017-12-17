@@ -239,7 +239,7 @@ public class PokedexEntry
 
     public void addLvlMove(int lvl, String move)
     {
-        QName key = new QName("lvl_" + lvl);
+        QName key = new QName("" + lvl);
         String old = entry.moves.lvlupMoves.values.get(key);
         if (old != null && old.contains(JsonMoves.convertMoveName(move))) return;
         else if (old == null) entry.moves.lvlupMoves.values.put(key, JsonMoves.convertMoveName(move));
