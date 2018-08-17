@@ -469,6 +469,8 @@ public class XMLEntries
         @XmlAttribute
         public Boolean   breed      = true;
         @XmlAttribute
+        public Boolean   dummy      = true;
+        @XmlAttribute
         public Boolean   starter    = false;
         @XmlAttribute
         public Boolean   ridable    = true;
@@ -480,6 +482,8 @@ public class XMLEntries
         public String    gender     = "";
         @XmlAttribute
         public String    genderBase = "";
+        @XmlAttribute
+        public String    sound      = "";
         @XmlElement(name = "STATS")
         public StatsNode stats;
         @XmlElement(name = "MOVES")
